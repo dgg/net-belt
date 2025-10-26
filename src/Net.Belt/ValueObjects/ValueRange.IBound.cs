@@ -14,14 +14,18 @@ public interface IBound<T> : IEquatable<IBound<T>> where T : IComparable<T>
 	/// <summary>
 	/// Gets the string representation of this bound when used as a lower bound.
 	/// </summary>
+	/// <param name="format">The format to use. -or- A null reference to use the default format defined for the type of <see cref="Value"/>.</param>
+	/// <param name="formatProvider">The provider to use to format the value. -or- A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
 	/// <returns>A string representing the lower-bound notation.</returns>
-	string Lower();
+	string Lower(string? format, IFormatProvider? formatProvider);
 
 	/// <summary>
 	/// Gets the string representation of this bound when used as an upper bound.
 	/// </summary>
+	/// <param name="format">The format to use. -or- A null reference to use the default format defined for the type of <see cref="Value"/>.</param>
+	/// <param name="formatProvider">The provider to use to format the value. -or- A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
 	/// <returns>A string representing the upper-bound notation.</returns>
-	string Upper();
+	string Upper(string? format, IFormatProvider? formatProvider);
 
 	/// <summary>
 	/// Determines whether the bound value is less than the specified value.

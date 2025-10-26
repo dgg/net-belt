@@ -1,3 +1,5 @@
+using System.Globalization;
+
 using Net.Belt.Tests.ValueObjects.Support;
 using Net.Belt.ValueObjects;
 
@@ -294,12 +296,22 @@ public class ValueRangeTester
 		Assert.That(subject.ToString(), Is.EqualTo("(1..5]"));
 	}
 
-	/*[Test]
+	[Test]
 	public void ToString_Dates_InvariantFormatting()
 	{
 		ValueRange<DateTimeOffset> subject = ValueRange.New(1.March(2025).InUtc(), 2.March(2025).InUtc());
-		Assert.That(subject.ToString(), Is.EqualTo("[1..5]"));
-	}*/
+		Assert.That(subject.ToString(), Is.EqualTo("[03/01/2025 00:00:00 +00:00..03/02/2025 00:00:00 +00:00]"));
+	}
+	
+	[Test]
+	public void ToString_CustomFormat_FormatAppliedToBounds()
+	{
+		ValueRange<DateTimeOffset> subject = ValueRange.New(1.March(2025).InUtc(), 2.March(2025).InUtc());
+		Assert.That(subject.ToString("u",  CultureInfo.GetCultureInfo("es")), Is.EqualTo("[2025-03-01 00:00:00Z..2025-03-02 00:00:00Z]"));
+		
+		// also to numbers
+		Assert.That(ValueRange.Open(1, 5).ToString("D2",  CultureInfo.InvariantCulture), Is.EqualTo("(01..05)"));
+	}
 
 	#endregion
 

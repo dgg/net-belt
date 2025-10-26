@@ -14,7 +14,7 @@ namespace Net.Belt.ValueObjects;
 /// Both bounds are represented by the IBound{T} interface, allowing for different bound types
 /// (e.g., inclusive or exclusive).
 /// </remarks>
-public record ValueRange<T> where T : IComparable<T>
+public record ValueRange<T> : IFormattable where T : IComparable<T>
 {
 	private readonly IBound<T> _lowerBound;
 
@@ -342,12 +342,17 @@ public record ValueRange<T> where T : IComparable<T>
 
 	// TODO: make it formattable 
 
+	/// <inheritdoc />
 	/// <remarks>
 	/// <c>..</c> separator used instead of standard <c>,</c> to avoid confusion with rational ranges.
 	/// <para><c>[ ]</c> used for closed bounds.</para>
 	/// <para><c>( )</c> used for open bounds, as it is clearer than inverted brackets <c>] [</c>.</para>
+	/// <para>It delegates to <see cref="ToString(string?, IFormatProvider?)"/> with <c>null</c> format and <see cref="CultureInfo.InvariantCulture"/>.</para>
 	/// </remarks>
-	public override string ToString() => $"{_lowerBound.Lower()}..{_upperBound.Upper()}";
+	public override string ToString() => ToString(null, CultureInfo.InvariantCulture);
+
+	/// <inheritdoc />
+	public string ToString(string? format, IFormatProvider? formatProvider) => $"{_lowerBound.Lower(format, formatProvider)}..{_upperBound.Upper(format, formatProvider)}";
 
 	private static IBound<T> min(IBound<T> x, IBound<T> y, Func<IBound<T>, IBound<T>, IBound<T>> equalSelection)
 	{

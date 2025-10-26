@@ -16,14 +16,22 @@ internal readonly record struct Closed<T>(T Value) : IBound<T> where T : ICompar
 	/// <summary>
 	/// Gets the string representation of this bound when used as a lower bound.
 	/// </summary>
+	/// <param name="format">The format to use. -or- A null reference to use the default format defined for the type of <see cref="Value"/>.</param>
+	/// <param name="formatProvider">The provider to use to format the value. -or- A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
 	/// <returns>A string in the format "[value" indicating a closed lower bound.</returns>
-	public string Lower() => "[" + Value;
+	public string Lower(string? format, IFormatProvider? formatProvider) => Value is IFormattable formattable
+		? "[" + formattable.ToString(format, formatProvider)
+		: "[" + Value;
 
 	/// <summary>
 	/// Gets the string representation of this bound when used as an upper bound.
 	/// </summary>
+	/// <param name="format">The format to use. -or- A null reference to use the default format defined for the type of <see cref="Value"/>.</param>
+	/// <param name="formatProvider">The provider to use to format the value. -or- A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
 	/// <returns>A string in the format "value]" indicating a closed upper bound.</returns>
-	public string Upper() => Value + "]";
+	public string Upper(string? format, IFormatProvider? formatProvider) => Value is IFormattable formattable
+		? formattable.ToString(format, formatProvider) + "]"
+		: Value + "]";
 
 	/// <summary>
 	/// Determines whether the bound value is less than or equal to the specified value.
@@ -84,7 +92,8 @@ internal readonly record struct Closed<T>(T Value) : IBound<T> where T : ICompar
 	/// </summary>
 	/// <param name="other">The bound to compare with.</param>
 	/// <returns>true if the other bound is also a Closed{T} with the same value; otherwise, false.</returns>
-	public bool Equals(IBound<T>? other) => other is Closed<T> && EqualityComparer<T>.Default.Equals(Value, other.Value);
+	public bool Equals(IBound<T>? other) =>
+		other is Closed<T> && EqualityComparer<T>.Default.Equals(Value, other.Value);
 }
 
 /// <summary>
@@ -101,14 +110,22 @@ internal readonly record struct Open<T>(T Value) : IBound<T> where T : IComparab
 	/// <summary>
 	/// Gets the string representation of this bound when used as a lower bound.
 	/// </summary>
+	/// <param name="format">The format to use. -or- A null reference to use the default format defined for the type of <see cref="Value"/>.</param>
+	/// <param name="formatProvider">The provider to use to format the value. -or- A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
 	/// <returns>A string in the format "(value" indicating an open lower bound.</returns>
-	public string Lower() => "(" + Value;
+	public string Lower(string? format, IFormatProvider? formatProvider) => Value is IFormattable formattable
+		? "(" + formattable.ToString(format, formatProvider)
+		: "(" + Value;
 
 	/// <summary>
 	/// Gets the string representation of this bound when used as an upper bound.
 	/// </summary>
+	/// <param name="format">The format to use. -or- A null reference to use the default format defined for the type of <see cref="Value"/>.</param>
+	/// <param name="formatProvider">The provider to use to format the value. -or- A null reference to obtain the numeric format information from the current locale setting of the operating system.</param>
 	/// <returns>A string in the format "value)" indicating an open upper bound.</returns>
-	public string Upper() => Value + ")";
+	public string Upper(string? format, IFormatProvider? formatProvider) => Value is IFormattable formattable
+		? formattable.ToString(format, formatProvider) + ")"
+		: Value + ")";
 
 	/// <summary>
 	/// Determines whether the bound value is strictly less than the specified value.
@@ -200,7 +217,7 @@ public static class Bound
 	/// For example, [5, 10] represents values from 5 to 10, including both 5 and 10.
 	/// </remarks>
 	public static IBound<T> Closed<T>(T value) where T : IComparable<T> => new Closed<T>(value);
-	
+
 	internal static void AssertRestrictionArguments<T>(IBound<T> x, IBound<T> y) where T : IComparable<T>
 	{
 		if (!x.Value.IsEqualTo(y.Value))
