@@ -55,3 +55,4 @@ nunit-*.xml
 
 # IDEs
 .idea/
+*.DotSettings.user
