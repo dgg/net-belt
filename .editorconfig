@@ -394,3 +394,35 @@ dotnet_naming_rule.private_methods_should_be_camelcase.style = camelcase
 dotnet_diagnostic.IDE1006.severity = warning
 # enforce static members for performance
 dotnet_diagnostic.CA1822.severity = warning
+
+#alignment preferences
+csharp_align_first_arg_by_paren = false
+csharp_align_linq_query = false
+csharp_align_multiline_argument = false
+csharp_align_multiline_array_and_object_initializer = false
+csharp_align_multiline_binary_expressions_chain = false
+csharp_align_multiline_binary_patterns = false
+csharp_align_multiline_calls_chain = false
+csharp_align_multiline_comments = true
+csharp_align_multiline_expression = false
+csharp_align_multiline_extends_list = false
+csharp_align_multiline_for_stmt = false
+csharp_align_multiline_list_pattern = false
+csharp_align_multiline_parameter = false
+csharp_align_multiline_property_pattern = false
+csharp_align_multiline_statement_conditions = false
+csharp_align_multiline_switch_expression = false
+csharp_align_multiline_type_parameter_constraints = false
+csharp_align_multiline_type_parameter_list = false
+csharp_align_multiple_declaration = false
+csharp_align_multline_type_parameter_constrains = false
+csharp_align_multline_type_parameter_list = false
+csharp_align_tuple_components = false
+csharp_indent_anonymous_method_block = false
+align_ternary = none
+
+# static fields naming override
+dotnet_naming_rule.private_static_fields_should_be_s_camelcase.style = _camelcase
+
+# local functions override
+dotnet_naming_rule.local_functions_should_be_pascalcase.style = _camelcase
