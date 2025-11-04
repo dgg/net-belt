@@ -1,0 +1,53 @@
+services:
+
+  clean:
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    volumes:
+      - ./src:/opt/net-belt/src
+      - ./test:/opt/net-belt/test
+    working_dir: /opt/net-belt
+    command: sh -c 'find . -iname bin -o -iname obj | xargs rm -rf'
+
+  build:
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    volumes:
+      - ./src:/opt/net-belt/src
+      - ./test:/opt/net-belt/test
+      - ./Net.Belt.sln:/opt/net-belt/Net.Belt.sln
+    working_dir: /opt/net-belt
+    command: dotnet build -c Release
+    #depends_on:
+    #  - clean
+
+  test:
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    volumes:
+      - ./src:/opt/net-belt/src
+      - ./test:/opt/net-belt/test
+    working_dir: /opt/net-belt
+    command: dotnet run --project test/Net.Belt.Tests/ -c Release -- --settings test/.runsettings
+    #depends_on:
+    #  - build
+
+  pack:
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    volumes:
+      - ./src:/opt/net-belt/src
+      - ./LICENSE:/opt/net-belt/LICENSE
+      - ./README.md:/opt/net-belt/README.md
+    working_dir: /opt/net-belt
+    command: dotnet pack src/Net.Belt/ -c Release --no-build
+    #depends_on:
+    #  - test
+
+  publish:
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    volumes:
+      - ./src:/opt/net-belt/src
+      - ${NUGET_CONFIG_PATH:-~/.nuget}:/root/.nuget
+    working_dir: /opt/net-belt
+    environment:
+      - NUGET_API_KEY=${NUGET_API_KEY}
+    command: dotnet nuget push src/Net.Belt/bin/Release/*.nupkg --api-key $$NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+    #depends_on:
+    #  - pack
