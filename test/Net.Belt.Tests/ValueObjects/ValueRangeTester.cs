@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 using Net.Belt.Tests.ValueObjects.Support;
 using Net.Belt.ValueObjects;
@@ -38,8 +39,9 @@ public class ValueRangeTester
 		Assert.That(() => new ValueRange<TimeSpan>(3.Seconds(), 2.Seconds()),
 			Throwz.BoundException(2.Seconds(), "00:00:02"));
 
-		Assert.That(() => new ValueRange<DateTime>(11.March(1977), 31.October(1952)),
-			Throwz.BoundException(31.October(1952), "31/10/1952"));
+		Assert.That(2.5.ToString(CultureInfo.CurrentCulture), Is.EqualTo("2,5"), "comma-separated decimals in Spain");
+		Assert.That(() => new ValueRange<double>(3.2, 2.5),
+			Throwz.BoundException(2.5, "2.5"));
 	}
 
 	[Test]
@@ -296,12 +298,29 @@ public class ValueRangeTester
 		Assert.That(subject.ToString(), Is.EqualTo("(1..5]"));
 	}
 
-	/*[Test]
-	public void ToString_Dates_InvariantFormatting()
+	[Test, SetCulture("da-DK")]
+	public void ToString_InvariantFormatting()
 	{
-		ValueRange<DateTimeOffset> subject = ValueRange.New(1.March(2025).InUtc(), 2.March(2025).InUtc());
-		Assert.That(subject.ToString(), Is.EqualTo("[1..5]"));
-	}*/
+		DateOnly lower = new(2025, 3, 1), upper = new(2025, 3, 2);
+		
+		Assert.That(lower.ToString(), Is.EqualTo("01.03.2025"), "day.month.year");
+		
+		ValueRange<DateOnly> subject = ValueRange.New(lower, upper);
+		Assert.That(subject.ToString(), Does.StartWith("[03/01/2025..").And
+			.EndsWith("..03/02/2025]"), "month/day/year");
+	}
+	
+	[Test, SetCulture("da-DK")]
+	public void ToString_CustomFormatting()
+	{
+		DateOnly lower = new(2025, 3, 1), upper = new(2025, 3, 2);
+		
+		Assert.That(lower.ToString(), Is.EqualTo("01.03.2025"), "day.month.year");
+		
+		ValueRange<DateOnly> subject = ValueRange.New(lower, upper);
+		Assert.That(subject.ToString("o", CultureInfo.InvariantCulture), Does.StartWith("[2025-03-01..").And
+			.EndsWith("..2025-03-02]"), "year-month-day");
+	}
 
 	#endregion
 

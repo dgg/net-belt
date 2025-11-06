@@ -14,7 +14,7 @@ namespace Net.Belt.ValueObjects;
 /// Both bounds are represented by the IBound{T} interface, allowing for different bound types
 /// (e.g., inclusive or exclusive).
 /// </remarks>
-public readonly record struct ValueRange<T> where T : IComparable<T>
+public readonly record struct ValueRange<T> : IFormattable where T : IComparable<T>
 {
 	/// <summary>
 	/// Gets the lower bound of the range as a <see cref="Bound{T}"/> instance (e.g., open or closed).
@@ -192,8 +192,8 @@ public readonly record struct ValueRange<T> where T : IComparable<T>
 	/// <returns>An enumerable sequence of values within the range.</returns>
 	public IEnumerable<T> Generate(T increment)
 	{
-		_nextGenerator ??= initNextGenerator(increment);
-		return Generate(_nextGenerator);
+		Func<T, T> generator = initNextGenerator(increment);
+		return Generate(generator);
 	}
 
 	#region bound checking
@@ -248,8 +248,10 @@ public readonly record struct ValueRange<T> where T : IComparable<T>
 	/// <returns>An exception that explains the invalid range.</returns>
 	private static ArgumentOutOfRangeException exception(T lowerBound, T upperBound)
 	{
-		string message =
-			$"The lower bound of the range ('{lowerBound}') must not be greater than upper bound ('{upperBound}').";
+		string? lowerRepresentation = lowerBound is IFormattable upperFormattable ? upperFormattable.ToString(null, CultureInfo.InvariantCulture) : lowerBound.ToString();
+		string? upperRepresentation = upperBound is IFormattable lowerFormattable ? lowerFormattable.ToString(null, CultureInfo.InvariantCulture) : upperBound.ToString();
+		string message = string.Create(CultureInfo.InvariantCulture,
+			$"The lower bound of the range ('{lowerRepresentation}') must not be greater than upper bound ('{upperRepresentation}').");
 
 		return new ArgumentOutOfRangeException(nameof(upperBound), upperBound, message);
 	}
@@ -297,53 +299,18 @@ public readonly record struct ValueRange<T> where T : IComparable<T>
 	/// </summary>
 	public static ValueRange<T> Empty { get; } = new() { IsEmpty = true };
 
-/*
-	/// <summary>
-	/// Gets an empty value range instance of type <see cref="ValueRange{T}"/>.
-	/// </summary>
-	/// <remarks>
-	/// This property represents a predefined empty range for the specified type.
-	/// It is useful as a constant or default value when no range is applicable.
-	/// </remarks>
-	public static ValueRange<T> Empty { get { return EmptyRange<T>.Instance; } }
-
-	private sealed record EmptyRange<TEmpty> : where TEmpty : IComparable<TEmpty>
-	{
-		private EmptyRange() { }
-		public override bool Contains(TEmpty item) => false;
-		public override ValueRange<TEmpty> Intersect(ValueRange<TEmpty>? range) => this;
-		public override ValueRange<TEmpty> Join(ValueRange<TEmpty>? range) => range ?? this;
-		public override bool Overlaps(ValueRange<TEmpty>? range) => false;
-		public override TEmpty Limit(TEmpty value) => value;
-		public override TEmpty LimitLower(TEmpty value) => value;
-		public override TEmpty LimitUpper(TEmpty value) => value;
-		public override IEnumerable<TEmpty> Generate(TEmpty increment) => [];
-		public override IEnumerable<TEmpty> Generate(Func<TEmpty, TEmpty> increment) => [];
-
-		public override string ToString() => base.ToString();
-
-		public static ValueRange<TEmpty> Instance { get => Nested.TheInstance; }
-
-		class Nested
-		{
-			// Explicit static constructor to tell C# compiler
-			// not to mark the type as beforefieldinit
-			static Nested() { }
-			internal static readonly ValueRange<TEmpty> TheInstance = new EmptyRange<TEmpty>();
-		}
-	}
-	-*/
-
 	#endregion
-
-	// TODO: make it formattable 
 
 	/// <remarks>
 	/// <c>..</c> separator used instead of standard <c>,</c> to avoid confusion with rational ranges.
 	/// <para><c>[ ]</c> used for closed bounds.</para>
 	/// <para><c>( )</c> used for open bounds, as it is clearer than inverted brackets <c>] [</c>.</para>
 	/// </remarks>
-	public override string ToString() => $"{LowerBound.Lower()}..{UpperBound.Upper()}";
+	public override string ToString() => ToString(null, CultureInfo.InvariantCulture);
+
+	/// <inheritdoc />
+	public string ToString(string? format, IFormatProvider? formatProvider) =>
+		$"{LowerBound.Lower(format, formatProvider)}..{UpperBound.Upper(format, formatProvider)}";
 
 	private static Bound<T> min(Bound<T> x, Bound<T> y, Func<Bound<T>, Bound<T>, Bound<T>> equalSelection)
 	{
@@ -382,8 +349,6 @@ public readonly record struct ValueRange<T> where T : IComparable<T>
 		if (value.IsLessThan(lowerBound)) result = lowerBound;
 		return result;
 	}
-
-	private static Func<T, T>? _nextGenerator;
 
 	private static Func<T, T> initNextGenerator(T step)
 	{

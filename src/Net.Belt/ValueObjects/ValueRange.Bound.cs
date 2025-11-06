@@ -1,3 +1,5 @@
+using System.Globalization;
+
 using Net.Belt.Extensions.Comparable;
 
 namespace Net.Belt.ValueObjects;
@@ -33,15 +35,29 @@ public readonly record struct Bound<T>(T Value, bool IsClosed) where T : ICompar
 	/// <summary>
 	/// Gets the string representation of this bound when used as a lower bound.
 	/// </summary>
+	/// <param name="format">The format string to use, or null to use the default format defined for the type of the range.</param>
+	/// <param name="formatProvider">An object that provides culture-specific formatting information,
+	/// or null to use the current culture.</param>
 	/// <returns>A string in the format "[value" indicating a closed lower bound or "(value" indicating an open lower bound.</returns>
-	internal string Lower() => IsClosed ? "[" + Value : "(" + Value;
+	internal string Lower(string? format, IFormatProvider? formatProvider)
+	{
+		string? formattedValue = Value is IFormattable formattable ? formattable.ToString(format, formatProvider) : Value.ToString();
+		return IsClosed ? "[" + formattedValue : "(" + formattedValue;
+	}
 
 	/// <summary>
 	/// Gets the string representation of this bound when used as an upper bound.
 	/// </summary>
+	/// <param name="format">The format string to use, or null to use the default format defined for the type of the range.</param>
+	/// <param name="formatProvider">An object that provides culture-specific formatting information,
+	/// or null to use the current culture.</param>
 	/// <returns>A string in the format "value]" indicating a closed upper bound or "value)" indicating an open upper bound.</returns>
-	internal string Upper() => IsClosed ? Value + "]" : Value + ")";
-	
+	internal string Upper(string? format, IFormatProvider? formatProvider)
+	{
+		string? formattedValue = Value is IFormattable formattable ? formattable.ToString(format, formatProvider) : Value.ToString();
+		return IsClosed ? formattedValue + "]" : formattedValue + ")";
+	}
+
 	/// <summary>
 	/// Determines whether the bound value is less than the specified value.
 	/// </summary>
@@ -68,7 +84,7 @@ public readonly record struct Bound<T>(T Value, bool IsClosed) where T : ICompar
 	/// Converts the bound to an assertion string representation.
 	/// </summary>
 	/// <returns>A string in the format "value (inclusive/not inclusive)" for error messages and assertions.</returns>
-	internal string ToAssertion() => $"{Value} {(IsClosed ? "(inclusive)" : "(not inclusive)")}";
+	internal string ToAssertion() => string.Create(CultureInfo.InvariantCulture, $"{Value} {(IsClosed ? "(inclusive)" : "(not inclusive)")}");
 
 	/// <summary>
 	/// Determines whether this bound touches another bound (i.e., they share a common value).
