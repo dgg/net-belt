@@ -174,16 +174,19 @@ public class ValueRangeShowcase
 			.Dump("same bounds with different nature");
 		
 		// equal is the same for record structs
-		(ValueRange.Closed('a', 'z') == ValueRange.Closed('a', 'z')).Dump("Equal is the same for record structs");
+		(ValueRange.Closed('a', 'z') == ValueRange.Closed('a', 'z'))
+			.Dump("Equal is the same for record structs");
 		
 		// type matters
 		ValueRange.Closed<byte>(2, 4).Equals(ValueRange.Closed(2ul, 4ul))
 			.Dump("type matters");
 
 		// empty is an "only child"
-		ValueRange.Empty<TimeSpan>().Equals(ValueRange.Degenerate(TimeSpan.Zero)).Dump("empty is an 'only child'");
+		ValueRange.Empty<TimeSpan>().Equals(ValueRange.Degenerate(TimeSpan.Zero))
+			.Dump("empty is an 'only child'");
 
 		// but not so unique
-		(ValueRange.Empty<TimeSpan>() == ValueRange.Empty<TimeSpan>()).Dump("but not so unique");
+		(ValueRange.Empty<TimeSpan>() == ValueRange.Empty<TimeSpan>())
+			.Dump("but not so unique");
 	}
 }
