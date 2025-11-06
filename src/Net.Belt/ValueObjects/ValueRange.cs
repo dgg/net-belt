@@ -14,37 +14,32 @@ namespace Net.Belt.ValueObjects;
 /// Both bounds are represented by the IBound{T} interface, allowing for different bound types
 /// (e.g., inclusive or exclusive).
 /// </remarks>
-public record ValueRange<T> where T : IComparable<T>
+public readonly record struct ValueRange<T> : IFormattable where T : IComparable<T>
 {
-	private readonly IBound<T> _lowerBound;
-
 	/// <summary>
-	/// Gets the lower bound of the range as an <see cref="IBound{T}"/> instance (e.g., open or closed).
+	/// Gets the lower bound of the range as a <see cref="Bound{T}"/> instance (e.g., open or closed).
 	/// </summary>
-	public IBound<T> LowerBound => _lowerBound;
+	public Bound<T> LowerBound { get; }
 
 	/// <summary>
 	/// Gets the value of the lower bound.
 	/// </summary>
-	public T Lower => _lowerBound.Value;
-
-	private readonly IBound<T> _upperBound;
+	public T Lower => LowerBound.Value;
 
 	/// <summary>
-	/// Gets the upper bound of the range as an <see cref="IBound{T}"/> instance (e.g., open or closed).
+	/// Gets the upper bound of the range as a <see cref="Bound{T}"/> instance (e.g., open or closed).
 	/// </summary>
-	public IBound<T> UpperBound => _upperBound;
+	public Bound<T> UpperBound { get; }
 
 	/// <summary>
 	/// Gets the value of the upper bound.
 	/// </summary>
-	public T Upper => _upperBound.Value;
+	public T Upper => UpperBound.Value;
 
-	private ValueRange()
-	{
-		_lowerBound = new Open<T>(default!);
-		_upperBound = new Open<T>(default!);
-	}
+	/// <summary>
+	/// Indicates whether the current range is empty, meaning it does not represent any valid values (Null Object).
+	/// </summary>
+	public bool IsEmpty { get; private init; }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="ValueRange{T}"/> with specified lower and upper bounds.
@@ -52,11 +47,11 @@ public record ValueRange<T> where T : IComparable<T>
 	/// <param name="lowerBound">The lower bound of the range.</param>
 	/// <param name="upperBound">The upper bound of the range.</param>
 	/// <exception cref="ArgumentOutOfRangeException">Thrown when the lower bound is greater than the upper bound.</exception>
-	public ValueRange(IBound<T> lowerBound, IBound<T> upperBound)
+	public ValueRange(Bound<T> lowerBound, Bound<T> upperBound)
 	{
 		AssertBounds(lowerBound, upperBound);
-		_lowerBound = lowerBound;
-		_upperBound = upperBound;
+		LowerBound = lowerBound;
+		UpperBound = upperBound;
 	}
 
 	/// <summary>
@@ -69,8 +64,8 @@ public record ValueRange<T> where T : IComparable<T>
 	{
 		AssertBounds(lowerBound, upperBound);
 
-		_lowerBound = new Closed<T>(lowerBound);
-		_upperBound = new Closed<T>(upperBound);
+		LowerBound = Bound.Closed(lowerBound);
+		UpperBound = Bound.Closed(upperBound);
 	}
 
 	/// <summary>
@@ -79,7 +74,7 @@ public record ValueRange<T> where T : IComparable<T>
 	/// </summary>
 	/// <param name="item">The value to test.</param>
 	/// <returns><see langword="true"/> if the value is within the range; otherwise, <see langword="false"/>.</returns>
-	public virtual bool Contains(T item) => _lowerBound.LessThan(item) && _upperBound.MoreThan(item);
+	public bool Contains(T item) => LowerBound.LessThan(item) && UpperBound.MoreThan(item);
 
 	/// <summary>
 	/// Computes the intersection of the current value range with another specified value range.
@@ -90,24 +85,24 @@ public record ValueRange<T> where T : IComparable<T>
 	/// A new <see cref="ValueRange{T}"/> representing the intersection of the two ranges.
 	/// If no intersection exists or the provided range is null, returns the empty value range.
 	/// </returns>
-	public virtual ValueRange<T> Intersect(ValueRange<T>? range)
+	public ValueRange<T> Intersect(ValueRange<T>? range)
 	{
 		ValueRange<T> intersection = Empty;
 
-		if (range != null && !ReferenceEquals(range, Empty))
+		if (range is { IsEmpty: false })
 		{
-			if (_lowerBound.Touches(range._upperBound))
+			if (LowerBound.Touches(range.Value.UpperBound))
 			{
 				intersection = ValueRange.Degenerate(Lower);
 			}
-			else if (_upperBound.Touches(range._lowerBound))
+			else if (UpperBound.Touches(range.Value.LowerBound))
 			{
 				intersection = ValueRange.Degenerate(Upper);
 			}
-			else if (Lower.IsLessThan(range.Upper) && Upper.IsMoreThan(range.Lower))
+			else if (Lower.IsLessThan(range.Value.Upper) && Upper.IsMoreThan(range.Value.Lower))
 			{
-				IBound<T> lower = max(_lowerBound, range._lowerBound, (x, y) => x.MoreRestrictive(y)),
-					upper = min(_upperBound, range._upperBound, (x, y) => x.MoreRestrictive(y));
+				Bound<T> lower = max(LowerBound, range.Value.LowerBound, (x, y) => x.MoreRestrictive(y)),
+					upper = min(UpperBound, range.Value.UpperBound, (x, y) => x.MoreRestrictive(y));
 				intersection = new ValueRange<T>(lower, upper);
 			}
 		}
@@ -121,12 +116,13 @@ public record ValueRange<T> where T : IComparable<T>
 	/// </summary>
 	/// <param name="range">The range to join with the current range. If null or empty, only the current range is returned.</param>
 	/// <returns>A new <see cref="ValueRange{T}"/> representing the union of the two ranges. If the input range is null or empty, the current range is returned.</returns>
-	public virtual ValueRange<T> Join(ValueRange<T>? range)
+	public ValueRange<T> Join(ValueRange<T>? range)
 	{
-		if (range == null || ReferenceEquals(range, Empty)) return this;
+		if (!range.HasValue || range.Value.IsEmpty) return this;
+		if (IsEmpty) return range.Value;
 
-		IBound<T> lower = min(_lowerBound, range._lowerBound, (x, y) => x.LessRestrictive(y)),
-			upper = max(_upperBound, range._upperBound, (x, y) => x.LessRestrictive(y));
+		Bound<T> lower = min(LowerBound, range.Value.LowerBound, (x, y) => x.LessRestrictive(y)),
+			upper = max(UpperBound, range.Value.UpperBound, (x, y) => x.LessRestrictive(y));
 
 		return new ValueRange<T>(lower, upper);
 	}
@@ -136,36 +132,30 @@ public record ValueRange<T> where T : IComparable<T>
 	/// </summary>
 	/// <param name="range">The range to check for overlap against the current range.</param>
 	/// <returns>True if the ranges overlap; otherwise, false.</returns>
-	public virtual bool Overlaps(ValueRange<T>? range)
+	public bool Overlaps(ValueRange<T>? range)
 	{
-		if (range == null || ReferenceEquals(range, Empty)) return false;
+		if (!range.HasValue || range.Value.IsEmpty) return false;
 
-		bool overlaps = _lowerBound.Touches(range._upperBound) ||
-			_upperBound.Touches(range._lowerBound) ||
-			(Lower.IsLessThan(range.Upper) && Upper.IsMoreThan(range.Lower));
+		bool overlaps = LowerBound.Touches(range.Value.UpperBound) ||
+			UpperBound.Touches(range.Value.LowerBound) ||
+			(Lower.IsLessThan(range.Value.Upper) && Upper.IsMoreThan(range.Value.Lower));
 
 		return overlaps;
 	}
-	
+
 	/// <summary>
 	/// Limits the given value to the range's lower bound if it is less than the lower bound.
 	/// </summary>
 	/// <param name="value">The value to be limited.</param>
 	/// <returns>The adjusted value if less than the lower bound; otherwise, returns the original value.</returns>
-	public virtual T LimitLower(T value)
-	{
-		return limit(value, Lower, value);
-	}
+	public T LimitLower(T value) => IsEmpty ? value : limit(value, Lower, value);
 
 	/// <summary>
 	/// Returns the specified value limited to the upper bound of the range.
 	/// </summary>
 	/// <param name="value">The input value to be compared against the upper bound.</param>
 	/// <returns>The input value if it is less than or equal to the upper bound; otherwise, the upper bound.</returns>
-	public virtual T LimitUpper(T value)
-	{
-		return limit(value, value, Upper);
-	}
+	public T LimitUpper(T value) => IsEmpty ? value : limit(value, value, Upper);
 
 	/// <summary>
 	/// Restricts a value to be within the defined lower and upper bounds of the range.
@@ -174,10 +164,7 @@ public record ValueRange<T> where T : IComparable<T>
 	/// <returns>
 	/// The value adjusted to be within the bounds, returning the lower bound if the value is less, or the upper bound if it exceeds.
 	/// </returns>
-	public virtual T Limit(T value)
-	{
-		return limit(value, Lower, Upper);
-	}
+	public T Limit(T value) => IsEmpty ? value : limit(value, Lower, Upper);
 
 	/// <summary>
 	/// Generates a sequence of values within the range using the specified generator function.
@@ -185,14 +172,15 @@ public record ValueRange<T> where T : IComparable<T>
 	/// <param name="nextGenerator">A function that generates the next value in the sequence based on the current value.</param>
 	/// <returns>A sequence of values contained within the range.</returns>
 	/// <exception cref="ArgumentException">Thrown if the generator function does not produce incrementing values.</exception>
-	public virtual IEnumerable<T> Generate(Func<T, T> nextGenerator)
+	public IEnumerable<T> Generate(Func<T, T> nextGenerator)
 	{
-		T numberInRange = _lowerBound.Generate(nextGenerator);
-		while (_upperBound.MoreThan(numberInRange))
+		T numberInRange = LowerBound.Generate(nextGenerator);
+		while (UpperBound.MoreThan(numberInRange))
 		{
 			yield return numberInRange;
 			T next = nextGenerator(numberInRange);
-			if (next.IsAtMost(numberInRange)) throw new ArgumentException("The generator must generate incrementing values", nameof(nextGenerator));
+			if (next.IsAtMost(numberInRange))
+				throw new ArgumentException("The generator must generate incrementing values", nameof(nextGenerator));
 			numberInRange = next;
 		}
 	}
@@ -202,10 +190,10 @@ public record ValueRange<T> where T : IComparable<T>
 	/// </summary>
 	/// <param name="increment">The value by which to increment each step in the sequence.</param>
 	/// <returns>An enumerable sequence of values within the range.</returns>
-	public virtual IEnumerable<T> Generate(T increment)
+	public IEnumerable<T> Generate(T increment)
 	{
-		_nextGenerator = _nextGenerator ?? initNextGenerator(increment);
-		return Generate(_nextGenerator);
+		Func<T, T> generator = initNextGenerator(increment);
+		return Generate(generator);
 	}
 
 	#region bound checking
@@ -220,7 +208,7 @@ public record ValueRange<T> where T : IComparable<T>
 	/// Returns true if the provided bounds form a valid range (i.e., the lower bound is strictly less than
 	/// the upper bound value, honoring bound semantics).
 	/// </summary>
-	public static bool CheckBounds(IBound<T> lowerBound, IBound<T> upperBound) => lowerBound.LessThan(upperBound.Value);
+	public static bool CheckBounds(Bound<T> lowerBound, Bound<T> upperBound) => lowerBound.LessThan(upperBound.Value);
 
 	/// <summary>
 	/// Ensures the specified bounds form a valid range; throws if they do not.
@@ -228,7 +216,7 @@ public record ValueRange<T> where T : IComparable<T>
 	/// <param name="lowerBound">The lower bound to validate.</param>
 	/// <param name="upperBound">The upper bound to validate.</param>
 	/// <exception cref="ArgumentOutOfRangeException">Thrown when the bounds are invalid.</exception>
-	public static void AssertBounds(IBound<T> lowerBound, IBound<T> upperBound)
+	public static void AssertBounds(Bound<T> lowerBound, Bound<T> upperBound)
 	{
 		if (!CheckBounds(lowerBound, upperBound))
 		{
@@ -260,8 +248,10 @@ public record ValueRange<T> where T : IComparable<T>
 	/// <returns>An exception that explains the invalid range.</returns>
 	private static ArgumentOutOfRangeException exception(T lowerBound, T upperBound)
 	{
-		string message =
-			$"The lower bound of the range ('{lowerBound}') must not be greater than upper bound ('{upperBound}').";
+		string? lowerRepresentation = lowerBound is IFormattable upperFormattable ? upperFormattable.ToString(null, CultureInfo.InvariantCulture) : lowerBound.ToString();
+		string? upperRepresentation = upperBound is IFormattable lowerFormattable ? lowerFormattable.ToString(null, CultureInfo.InvariantCulture) : upperBound.ToString();
+		string message = string.Create(CultureInfo.InvariantCulture,
+			$"The lower bound of the range ('{lowerRepresentation}') must not be greater than upper bound ('{upperRepresentation}').");
 
 		return new ArgumentOutOfRangeException(nameof(upperBound), upperBound, message);
 	}
@@ -277,7 +267,7 @@ public record ValueRange<T> where T : IComparable<T>
 		if (!Contains(value))
 		{
 			string message =
-				$"The value must be between {_lowerBound.ToAssertion()} and {_upperBound.ToAssertion()}. That is, contained within {this}.";
+				$"The value must be between {LowerBound.ToAssertion()} and {UpperBound.ToAssertion()}. That is, contained within {this}.";
 			throw new ArgumentOutOfRangeException(paramName, value, message);
 		}
 	}
@@ -304,54 +294,27 @@ public record ValueRange<T> where T : IComparable<T>
 	#region Empty Range
 
 	/// <summary>
-	/// Gets an empty value range instance of type <see cref="ValueRange{T}"/>.
+	/// Gets an empty instance of <see cref="ValueRange{T}"/> for a specific type.
+	/// Represents a range that contains no elements.
 	/// </summary>
-	/// <remarks>
-	/// This property represents a predefined empty range for the specified type.
-	/// It is useful as a constant or default value when no range is applicable.
-	/// </remarks>
-	public static ValueRange<T> Empty { get { return EmptyRange<T>.Instance; } }
-
-	private sealed record EmptyRange<TEmpty> : ValueRange<TEmpty> where TEmpty : IComparable<TEmpty>
-	{
-		private EmptyRange() { }
-		public override bool Contains(TEmpty item) => false;
-		public override ValueRange<TEmpty> Intersect(ValueRange<TEmpty>? range) => this;
-		public override ValueRange<TEmpty> Join(ValueRange<TEmpty>? range) => range ?? this;
-		public override bool Overlaps(ValueRange<TEmpty>? range) => false;
-		public override TEmpty Limit(TEmpty value) => value;
-		public override TEmpty LimitLower(TEmpty value) => value;
-		public override TEmpty LimitUpper(TEmpty value) => value;
-		public override IEnumerable<TEmpty> Generate(TEmpty increment) => [];
-		public override IEnumerable<TEmpty> Generate(Func<TEmpty, TEmpty> increment) => [];
-
-		public override string ToString() => base.ToString();
-
-		public static ValueRange<TEmpty> Instance { get => Nested.TheInstance; }
-
-		class Nested
-		{
-			// Explicit static constructor to tell C# compiler
-			// not to mark the type as beforefieldinit
-			static Nested() { }
-			internal static readonly ValueRange<TEmpty> TheInstance = new EmptyRange<TEmpty>();
-		}
-	}
+	public static ValueRange<T> Empty { get; } = new() { IsEmpty = true };
 
 	#endregion
-
-	// TODO: make it formattable 
 
 	/// <remarks>
 	/// <c>..</c> separator used instead of standard <c>,</c> to avoid confusion with rational ranges.
 	/// <para><c>[ ]</c> used for closed bounds.</para>
 	/// <para><c>( )</c> used for open bounds, as it is clearer than inverted brackets <c>] [</c>.</para>
 	/// </remarks>
-	public override string ToString() => $"{_lowerBound.Lower()}..{_upperBound.Upper()}";
+	public override string ToString() => ToString(null, CultureInfo.InvariantCulture);
 
-	private static IBound<T> min(IBound<T> x, IBound<T> y, Func<IBound<T>, IBound<T>, IBound<T>> equalSelection)
+	/// <inheritdoc />
+	public string ToString(string? format, IFormatProvider? formatProvider) =>
+		$"{LowerBound.Lower(format, formatProvider)}..{UpperBound.Upper(format, formatProvider)}";
+
+	private static Bound<T> min(Bound<T> x, Bound<T> y, Func<Bound<T>, Bound<T>, Bound<T>> equalSelection)
 	{
-		IBound<T> min;
+		Bound<T> min;
 		if (x.Value.IsEqualTo(y.Value))
 		{
 			min = equalSelection(x, y);
@@ -364,9 +327,9 @@ public record ValueRange<T> where T : IComparable<T>
 		return min;
 	}
 
-	private static IBound<T> max(IBound<T> x, IBound<T> y, Func<IBound<T>, IBound<T>, IBound<T>> equalSelection)
+	private static Bound<T> max(Bound<T> x, Bound<T> y, Func<Bound<T>, Bound<T>, Bound<T>> equalSelection)
 	{
-		IBound<T> max;
+		Bound<T> max;
 		if (x.Value.IsEqualTo(y.Value))
 		{
 			max = equalSelection(x, y);
@@ -378,7 +341,7 @@ public record ValueRange<T> where T : IComparable<T>
 
 		return max;
 	}
-	
+
 	private static T limit(T value, T lowerBound, T upperBound)
 	{
 		T result = value;
@@ -386,8 +349,7 @@ public record ValueRange<T> where T : IComparable<T>
 		if (value.IsLessThan(lowerBound)) result = lowerBound;
 		return result;
 	}
-	
-	private static Func<T, T>? _nextGenerator;
+
 	private static Func<T, T> initNextGenerator(T step)
 	{
 		ParameterExpression current = Expression.Parameter(typeof(T), "current");

@@ -117,3 +117,33 @@ public static class ValueRange
 
 	#endregion
 }
+
+/// <summary>
+/// Provides factory methods for creating open and closed bounds.
+/// </summary>
+public static class Bound
+{
+	/// <summary>
+	/// Creates an open (exclusive) bound with the specified value.
+	/// </summary>
+	/// <typeparam name="T">The type of the boundary value, which must implement IComparable{T}.</typeparam>
+	/// <param name="value">The boundary value to use.</param>
+	/// <returns>An open bound that excludes the specified value from the range.</returns>
+	/// <remarks>
+	/// Open bounds are exclusive, meaning the boundary value itself is not included in the range.
+	/// For example, (5, 10) represents values greater than 5 and less than 10.
+	/// </remarks>
+	public static Bound<T> Open<T>(T value) where T : IComparable<T> => Bound<T>.Open(value);
+
+	/// <summary>
+	/// Creates a closed (inclusive) bound with the specified value.
+	/// </summary>
+	/// <typeparam name="T">The type of the boundary value, which must implement IComparable{T}.</typeparam>
+	/// <param name="value">The boundary value to use.</param>
+	/// <returns>A closed bound that includes the specified value in the range.</returns>
+	/// <remarks>
+	/// Closed bounds are inclusive, meaning the boundary value itself is included in the range.
+	/// For example, [5, 10] represents values from 5 to 10, including both 5 and 10.
+	/// </remarks>
+	public static Bound<T> Closed<T>(T value) where T : IComparable<T> => Bound<T>.Closed(value);
+}

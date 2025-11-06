@@ -56,7 +56,6 @@ public static class ComparableExtensions
 	/// <param name="comparer">The comparer used to compare the values.</param>
 	/// <returns><c>true</c> if <paramref name="first"/> and <paramref name="second"/> are not equal according to <paramref name="comparer"/>; otherwise <c>false</c>.</returns>
 	/// <exception cref="ArgumentNullException">Thrown if <paramref name="comparer"/> is <c>null</c>.</exception>
-
 	public static bool IsDifferentFrom<T>(this T first, T second, IComparer<T> comparer) => !IsEqualTo(first, second, comparer);
 
 	/// <summary>
