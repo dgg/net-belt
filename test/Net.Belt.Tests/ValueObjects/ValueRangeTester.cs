@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using Net.Belt.Tests.ValueObjects.Support;
 using Net.Belt.ValueObjects;
 
@@ -469,7 +471,7 @@ public class ValueRangeTester
 		ValueRange<int> notEmpty = ValueRange.New(1, 10);
 
 		var intersection = notEmpty.Intersect(null);
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<int>()));
 	}
 
 	[Test]
@@ -478,14 +480,14 @@ public class ValueRangeTester
 		ValueRange<int> notEmpty = ValueRange.New(1, 10);
 
 		var intersection = notEmpty.Intersect(ValueRange.Empty<int>());
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<int>()));
 	}
 
 	[Test]
 	public void Intersect_EmptyToNull_Empty()
 	{
 		var intersection = ValueRange<byte>.Empty.Intersect(null);
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<byte>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<byte>()));
 	}
 
 	[Test]
@@ -493,14 +495,14 @@ public class ValueRangeTester
 	{
 		ValueRange<int> notEmpty = ValueRange.New(1, 10);
 		var intersection = ValueRange<int>.Empty.Intersect(notEmpty);
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<int>()));
 	}
 
 	[Test]
 	public void Intersect_EmptyToEmpty_Empty()
 	{
 		var intersection = ValueRange<byte>.Empty.Intersect(ValueRange.Empty<byte>());
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<byte>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<byte>()));
 	}
 
 	[Test]
@@ -510,7 +512,7 @@ public class ValueRangeTester
 			fiftytoHundred = ValueRange.New(50, 100);
 
 		var intersection = oneToTen.Intersect(fiftytoHundred);
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<int>()));
 	}
 
 	[Test]
@@ -520,7 +522,7 @@ public class ValueRangeTester
 		ValueRange<int> closed = ValueRange.Closed(1, 5);
 
 		var intersection = open.Intersect(closed);
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<int>()));
 	}
 
 	[Test]
@@ -530,7 +532,7 @@ public class ValueRangeTester
 		ValueRange<int> halfClosed = ValueRange.HalfClosed(10, 15);
 
 		var intersection = closed.Intersect(halfClosed);
-		Assert.That(intersection, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(intersection, Is.EqualTo(ValueRange.Empty<int>()));
 	}
 
 	[Test]
@@ -621,7 +623,7 @@ public class ValueRangeTester
 
 		ValueRange<int> union = range.Join(null);
 
-		Assert.That(union, Is.SameAs(range));
+		Assert.That(union, Is.EqualTo(range));
 	}
 
 	[Test]
@@ -630,7 +632,7 @@ public class ValueRangeTester
 		ValueRange<int> notEmpty = ValueRange.New(1, 3);
 
 		var union = notEmpty.Join(ValueRange.Empty<int>());
-		Assert.That(union, Is.SameAs(notEmpty));
+		Assert.That(union, Is.EqualTo(notEmpty));
 	}
 
 	[Test]
@@ -640,7 +642,7 @@ public class ValueRangeTester
 
 		var union = ValueRange.Empty<int>().Join(notEmpty);
 
-		Assert.That(union, Is.SameAs(notEmpty));
+		Assert.That(union, Is.EqualTo(notEmpty));
 	}
 
 	[Test]
@@ -648,7 +650,7 @@ public class ValueRangeTester
 	{
 		var union = ValueRange.Empty<int>().Join(null);
 
-		Assert.That(union, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(union, Is.EqualTo(ValueRange.Empty<int>()));
 	}
 
 	[Test]
@@ -656,7 +658,7 @@ public class ValueRangeTester
 	{
 		var union = ValueRange.Empty<byte>().Join(ValueRange<byte>.Empty);
 
-		Assert.That(union, Is.SameAs(ValueRange.Empty<byte>()));
+		Assert.That(union, Is.EqualTo(ValueRange.Empty<byte>()));
 	}
 
 	[Test]
@@ -1071,16 +1073,25 @@ public class ValueRangeTester
 	}
 
 	[Test]
-	public void Empty_IsSingleton()
+	public void Empty_IsEmpty() => Assert.That(ValueRange<int>.Empty.IsEmpty, Is.True);
+
+	[Test]
+	public void Default_IsNotEmpty()
 	{
-		Assert.That(ValueRange<int>.Empty, Is.SameAs(ValueRange.Empty<int>()));
+		Assert.That(new ValueRange<int>().IsEmpty, Is.False);
+		Assert.That(default(ValueRange<int>).IsEmpty, Is.False);
 	}
 
 	[Test]
-	public void Empty_DefaultBounds_NotIncluded()
+	public void Empty_IsNotDefault()
 	{
-		Assert.That(ValueRange.Empty<int>().ToString(), Is.EqualTo("(0..0)"));
+		Assert.That(ValueRange<int>.Empty, Is.Not.EqualTo(new ValueRange<int>()));
+		Assert.That(ValueRange<int>.Empty, Is.Not.EqualTo(default(ValueRange<int>)));
 	}
+
+	[Test]
+	public void Empty_DefaultBounds_NotIncluded() =>
+		Assert.That(ValueRange.Empty<int>().ToString(), Is.EqualTo("(0..0)"));
 
 	[Test]
 	public void Empty_Equals_DefaultDegenerated_False()
@@ -1089,12 +1100,10 @@ public class ValueRangeTester
 		Assert.That(ValueRange.Degenerate(0).Equals(ValueRange.Empty<int>()), Is.False);
 	}
 
-// effectively nothing is equal to Empty as creation of open singularity is not possible
+	// effectively nothing is equal to Empty as creation of open singularity is not possible
 	[Test]
-	public void Empty_IsOneOfAKind()
-	{
+	public void Empty_IsOneOfAKind() =>
 		Assert.That(() => ValueRange.Open(0, 0), Throws.InstanceOf<ArgumentOutOfRangeException>());
-	}
 
 	#endregion
 }
