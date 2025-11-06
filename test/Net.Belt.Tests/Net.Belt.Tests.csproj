@@ -21,6 +21,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Dumpify" Version="0.6.6" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
 		<!-- to prevent https://github.com/microsoft/testfx/issues/6686 -->
 		<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.0.4" />
