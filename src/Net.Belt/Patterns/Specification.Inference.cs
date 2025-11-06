@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace Net.Belt.Patterns;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace Net.Belt.Patterns;
 /// with a given predicate, enabling the use of the Specification design pattern
 /// for evaluating whether an object satisfies specific business rules.
 /// </summary>
-public static class Specification
+public static class PredicateSpecification
 {
 	/// <summary>
 	/// Creates a new instance of <see cref="PredicateSpecification{T}"/> using the provided predicate.

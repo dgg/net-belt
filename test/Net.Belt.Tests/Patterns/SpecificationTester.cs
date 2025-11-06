@@ -99,7 +99,7 @@ public class SpecificationTester
 		Specification<ComplexType> enabled = new ComplexType_Enabled(), barEven = new Bar_Even();
 		Func<ComplexType, bool> enabledOrDisabledAndBarEven = c => enabled.IsSatisfiedBy(c) || (!enabled.IsSatisfiedBy(c) && barEven.IsSatisfiedBy(c));
 		var q3 = from c in data where enabledOrDisabledAndBarEven(c) select c;
-		Assert.That(q3.ToArray(), Has.Length.EqualTo(6));
+		Assert.That(q3, Has.Exactly(6).Items);
 	}
 	
 	#endregion
