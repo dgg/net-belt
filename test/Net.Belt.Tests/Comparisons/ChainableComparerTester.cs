@@ -103,7 +103,7 @@ public class ChainableComparerTester
 			Assert.That(_subjects, Doez.RepresentAs("B, D, E, C, A"));
 		}
 
-		/*
+		
 		[Test]
 		public void ChainableComparer_By3Then2_FactoredWithSelectors()
 		{
@@ -129,7 +129,7 @@ public class ChainableComparerTester
 					.Then(s => s.Property2, Direction.Descending)),
 				Doez.RepresentAs("B, D, E, C, A"));
 		}
-		*/
+		
 
 		[Test]
 		public void Inheritors_DoNotHaveToCareAboutNulls()
