@@ -1,3 +1,5 @@
+using System.Collections;
+
 using Net.Belt.Extensions.Comparable;
 using Net.Belt.Tests.Extensions.Comparable.Support;
 
@@ -130,5 +132,32 @@ public class ComparableExtensionsTester
 		Assert.That(a.IsAtMost(b), Is.True);
 		Assert.That(a.IsLessThan(b), Is.True);
 		Assert.That(a.IsMoreThan(b), Is.False);
+	}
+
+	[Test]
+	public void Reverse_InvertResults()
+	{
+		var five = new GenericComparableSubject<int>(5);
+		var six = new GenericComparableSubject<int>(6);
+		IComparer<GenericComparableSubject<int>> comparer = Comparer<GenericComparableSubject<int>>.Default;
+
+		// sanity check
+		Assert.That(six.IsEqualTo(five), Is.False);
+		Assert.That(six.IsEqualTo(six), Is.True);
+		Assert.That(comparer.Compare(six, five), Is.Not.EqualTo(0));
+		Assert.That(comparer.Compare(six, six), Is.EqualTo(0));
+		
+		Assert.That(six.IsMoreThan(five), Is.True);
+		Assert.That(six.IsLessThan(six), Is.False);
+		Assert.That(comparer.Compare(six, five), Is.GreaterThan(0));
+		Assert.That(comparer.Compare(five, six), Is.LessThan(0));
+		
+		// reverse
+		IComparer<GenericComparableSubject<int>> subject = comparer.Reverse();
+		Assert.That(subject.Compare(six, five), Is.Not.EqualTo(0), "no change in equality");
+		Assert.That(subject.Compare(six, six), Is.EqualTo(0), "no change in equality");
+		
+		Assert.That(subject.Compare(six, five), Is.LessThan(0), "change in order");
+		Assert.That(subject.Compare(five, six), Is.GreaterThan(0), "change in order");
 	}
 }
