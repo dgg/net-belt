@@ -24,4 +24,12 @@ public class Cmp<T>
 	/// <returns>A <see cref="ChainableComparer{T}"/> that uses the specified key selector and sort direction.</returns>
 	public static ChainableComparer<T> By<TKey>(Func<T, TKey> keySelector,
 		Direction sortDirection = Direction.Ascending) => new SelectorComparer<T, TKey>(keySelector, sortDirection);
+
+	/// <summary>
+	/// Creates a <see cref="ChainableComparer{T}"/> that utilizes the natural ordering operators of the type <typeparamref name="T"/>.
+	/// </summary>
+	/// <param name="sortDirection">The sort direction, either <see cref="Direction.Ascending"/> or <see cref="Direction.Descending"/>. Defaults to <see cref="Direction.Ascending"/>.</param>
+	/// <returns>A <see cref="ChainableComparer{T}"/> that applies comparison logic based on the type's natural ordering operators.</returns>
+	public static ChainableComparer<T> FromOperators(Direction sortDirection = Direction.Ascending) =>
+		new OperatorComparer<T>(sortDirection);
 }
