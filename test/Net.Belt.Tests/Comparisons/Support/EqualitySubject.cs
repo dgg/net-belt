@@ -2,7 +2,7 @@ namespace Net.Belt.Tests.Comparisons.Support;
 
 internal class EqualitySubject
 {
-	public EqualitySubject()  { }
+	public EqualitySubject() { }
 
 	public EqualitySubject(string? s, int i, decimal d)
 	{
@@ -13,7 +13,7 @@ internal class EqualitySubject
 
 	public int I { get; init; }
 	public string? S { get; init; }
-	public decimal D { get; init;  }
+	public decimal D { get; init; }
 
 	public override string ToString() => "[" + S + " " + I + " " + D + "]";
 
