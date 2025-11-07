@@ -1,3 +1,5 @@
+using Net.Belt.Comparisons;
+
 namespace Net.Belt.Extensions.Comparable;
 
 /// <summary>
@@ -217,5 +219,14 @@ public static class ComparableExtensions
 
 	#endregion
 
-	// public static IComparer<T> Reverse<T>(this IComparer<T> comparer) => new ReversedComparer<T>(comparer);
+	/// <summary>
+	/// Returns a new comparer that reverses the order of comparisons performed by the specified comparer.
+	/// </summary>
+	/// <typeparam name="T">The type of objects to compare.</typeparam>
+	/// <param name="comparer">The original comparer to reverse. Cannot be null.</param>
+	/// <returns>A new <see cref="IComparer{T}"/> that performs comparisons in the reverse order.</returns>
+	/// <remarks>
+	/// This method wraps the specified comparer in a <see cref="ReversedComparer{T}"/>, which modifies the behavior of comparison operations to invert their results.
+	/// </remarks>
+	public static IComparer<T> Reverse<T>(this IComparer<T> comparer) => new ReversedComparer<T>(comparer);
 }
