@@ -70,15 +70,9 @@ public abstract class ChainableComparer<T>(Direction sortDirection = Direction.A
 	}
 
 	[MemberNotNullWhen(true, nameof(_nextComparer))]
-	private bool needsToEvaluateNext(int ret)
-	{
-		return ret == 0 && _nextComparer != null;
-	}
+	private bool needsToEvaluateNext(int ret) => ret == 0 && _nextComparer != null;
 
-	private static void invert(ref int result)
-	{
-		result *= -1;
-	}
+	private static void invert(ref int result) => result *= -1;
 
 	private ChainableComparer<T>? _nextComparer;
 
