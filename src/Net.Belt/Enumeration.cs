@@ -224,7 +224,7 @@ public class Enumeration
 	/// <summary>
 	/// Retrieves the name of the constant in the specified enumeration type that has the specified value.
 	/// </summary>
-	/// <param name="value">The value of a particular enumerated constant .</param>
+	/// <param name="value">The value of a particular enumerated constant.</param>
 	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
 	/// <returns>A string containing the name of the enumerated constant in <typeparamref name="TEnum"/> which value is <paramref name="value"/>.</returns>
 	/// <exception cref="ArgumentException">If the <paramref name="value"/> is not in <typeparamref name="TEnum"/></exception>
@@ -370,6 +370,70 @@ public class Enumeration
 	public static bool TryGetName<TEnum>(long underlying, [NotNullWhen(true)] out string? name)
 		where TEnum : struct, Enum
 		=> TryGetName<TEnum, long>(underlying, out name);
+
+	#endregion
+
+	/// <summary>
+	/// Returns the underlying type of the specified enumeration.
+	/// </summary>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>The underlying type of enumType.</returns>
+	public static Type GetUnderlyingType<TEnum>() where TEnum : struct, Enum => Enum.GetUnderlyingType(typeof(TEnum));
+
+	#region values
+
+	/// <summary>
+	/// Retrieves an array of the values of the constants in a specified enumeration type.
+	/// </summary>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>An array that contains the values of the constants in <typeparamref name="TEnum"/>.</returns>
+	public static TEnum[] GetValues<TEnum>() where TEnum : struct, Enum => Enum.GetValues<TEnum>();
+
+	/// <summary>
+	/// Gets the numeric value of an enumeration.
+	/// </summary>
+	/// <param name="value">The value of a particular enumerated constant.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <typeparam name="TUnderlying">Integral type of the value.</typeparam>
+	/// <returns>The numeric value of <paramref name="value"/> in <typeparamref name="TEnum"/></returns>
+	public static TUnderlying GetValue<TEnum, TUnderlying>(TEnum value)
+		where TEnum : struct, Enum
+		where TUnderlying : struct, INumber<TUnderlying>
+	{
+		AssertDefined(value);
+
+		return (TUnderlying)Convert.ChangeType(value, typeof(TUnderlying));
+	}
+
+	/// <summary>
+	/// Gets the numeric value of an enumeration.
+	/// A return value indicates whether the retrieval succeeded.
+	/// </summary>
+	/// <param name="value">The value of a particular enumerated constant.</param>
+	/// <param name="underlying">The numeric value of <paramref name="value"/> in <typeparamref name="TEnum"/>.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <typeparam name="TUnderlying">Integral type of the value.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was retrieved successfully; otherwise, <c>false</c>.</returns>
+	public static bool TryGetValue<TEnum, TUnderlying>(TEnum value, [NotNullWhen(true)]out TUnderlying? underlying)
+		where TEnum : struct, Enum
+		where TUnderlying : struct, INumber<TUnderlying>
+	{
+		bool result = false;
+		underlying = null;
+		if (IsDefined(value))
+		{
+			try
+			{
+				underlying = (TUnderlying)Convert.ChangeType(value, typeof(TUnderlying));
+				result = true;
+			}
+			// there is no Convert.CanChangeType :-(
+			catch (InvalidCastException) { }
+			catch (OverflowException) { }
+		}
+
+		return result;
+	}
 
 	#endregion
 }

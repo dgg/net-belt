@@ -341,99 +341,193 @@ public class EnumerationTester
 	}
 
 	#endregion
-	
+
 	#region TryGetName
 
-		[Test]
-		public void TryGetName_DefinedEnumValue_Name()
-		{
-			Assert.That(Enumeration.TryGetName(StringComparison.Ordinal, out string? name), Is.True);
-			Assert.That(name, Is.Not.Null.And.EqualTo(nameof(StringComparison.Ordinal)));
-		}
+	[Test]
+	public void TryGetName_DefinedEnumValue_Name()
+	{
+		Assert.That(Enumeration.TryGetName(StringComparison.Ordinal, out string? name), Is.True);
+		Assert.That(name, Is.Not.Null.And.EqualTo(nameof(StringComparison.Ordinal)));
+	}
 
-		[Test]
-		public void TryGetName_UndefinedEnumValue_False()
-		{
-			StringComparison undefined = (StringComparison)100;
-			Assert.That(Enumeration.TryGetName(undefined, out string? name), Is.False);
-			Assert.That(name, Is.Null);
-		}
+	[Test]
+	public void TryGetName_UndefinedEnumValue_False()
+	{
+		StringComparison undefined = (StringComparison)100;
+		Assert.That(Enumeration.TryGetName(undefined, out string? name), Is.False);
+		Assert.That(name, Is.Null);
+	}
 
-		[Test]
-		public void TryGetName_DefinedImplicitNumericValue_True()
-		{
-			byte bValue = 1;
-			Assert.That(Enumeration.TryGetName<ByteEnum>(bValue, out string? name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			sbyte sbValue = 1;
-			Assert.That(Enumeration.TryGetName<SByteEnum>(sbValue, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			short sValue = 1;
-			Assert.That(Enumeration.TryGetName<ShortEnum>(sValue, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			ushort usValue = 1;
-			Assert.That(Enumeration.TryGetName<UShortEnum>(usValue, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<IntEnum>(1, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<UIntEnum>(1U, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<LongEnum>(1L, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<ULongEnum>(1UL, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-		}
-		
-		[Test]
-		public void TryGetName_DefinedExplicitNumericValue_True()
-		{
-			Assert.That(Enumeration.TryGetName<ByteEnum, byte>(1, out string? name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<SByteEnum, sbyte>(1, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<ShortEnum, short>(1, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<UShortEnum, ushort>(1, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<IntEnum, int>(1, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<UIntEnum, uint>(1U, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<LongEnum, long>(1L, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-			Assert.That(Enumeration.TryGetName<ULongEnum, ulong>(1UL, out name), Is.True);
-			Assert.That(name, Is.EqualTo("Two"));
-		}
+	[Test]
+	public void TryGetName_DefinedImplicitNumericValue_True()
+	{
+		byte bValue = 1;
+		Assert.That(Enumeration.TryGetName<ByteEnum>(bValue, out string? name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		sbyte sbValue = 1;
+		Assert.That(Enumeration.TryGetName<SByteEnum>(sbValue, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		short sValue = 1;
+		Assert.That(Enumeration.TryGetName<ShortEnum>(sValue, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		ushort usValue = 1;
+		Assert.That(Enumeration.TryGetName<UShortEnum>(usValue, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<IntEnum>(1, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<UIntEnum>(1U, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<LongEnum>(1L, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<ULongEnum>(1UL, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+	}
 
-		[Test]
-		public void TryGetName_UndefinedImplicitNumericValue_False()
-		{
-			byte bValue = 100;
-			Assert.That(() => Enumeration.TryGetName<ByteEnum>(bValue, out _), Is.False);
-			sbyte sbValue = 100;
-			Assert.That(() => Enumeration.TryGetName<SByteEnum>(sbValue, out _), Is.False);
-			short sValue = 100;
-			Assert.That(() => Enumeration.TryGetName<ShortEnum>(sValue, out _), Is.False);
-			ushort usValue = 100;
-			Assert.That(() => Enumeration.TryGetName<UShortEnum>(usValue, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<IntEnum>(100, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<UIntEnum>(100U, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<LongEnum>(100L, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<ULongEnum>(100UL, out _), Is.False);
-		}
-		
-		[Test]
-		public void TryGetName_UndefinedExplicitNumericValue_False()
-		{
-			Assert.That(() => Enumeration.TryGetName<ByteEnum, byte>(100, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<SByteEnum, sbyte>(100, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<ShortEnum, short>(100, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<UShortEnum, ushort>(10, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<IntEnum, int>(100, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<UIntEnum, uint>(100U, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<LongEnum, long>(100L, out _), Is.False);
-			Assert.That(() => Enumeration.TryGetName<ULongEnum, ulong>(100UL, out _), Is.False);
-		}
+	[Test]
+	public void TryGetName_DefinedExplicitNumericValue_True()
+	{
+		Assert.That(Enumeration.TryGetName<ByteEnum, byte>(1, out string? name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<SByteEnum, sbyte>(1, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<ShortEnum, short>(1, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<UShortEnum, ushort>(1, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<IntEnum, int>(1, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<UIntEnum, uint>(1U, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<LongEnum, long>(1L, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+		Assert.That(Enumeration.TryGetName<ULongEnum, ulong>(1UL, out name), Is.True);
+		Assert.That(name, Is.EqualTo("Two"));
+	}
 
-		#endregion
+	[Test]
+	public void TryGetName_UndefinedImplicitNumericValue_False()
+	{
+		byte bValue = 100;
+		Assert.That(() => Enumeration.TryGetName<ByteEnum>(bValue, out _), Is.False);
+		sbyte sbValue = 100;
+		Assert.That(() => Enumeration.TryGetName<SByteEnum>(sbValue, out _), Is.False);
+		short sValue = 100;
+		Assert.That(() => Enumeration.TryGetName<ShortEnum>(sValue, out _), Is.False);
+		ushort usValue = 100;
+		Assert.That(() => Enumeration.TryGetName<UShortEnum>(usValue, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<IntEnum>(100, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<UIntEnum>(100U, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<LongEnum>(100L, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<ULongEnum>(100UL, out _), Is.False);
+	}
+
+	[Test]
+	public void TryGetName_UndefinedExplicitNumericValue_False()
+	{
+		Assert.That(() => Enumeration.TryGetName<ByteEnum, byte>(100, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<SByteEnum, sbyte>(100, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<ShortEnum, short>(100, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<UShortEnum, ushort>(10, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<IntEnum, int>(100, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<UIntEnum, uint>(100U, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<LongEnum, long>(100L, out _), Is.False);
+		Assert.That(() => Enumeration.TryGetName<ULongEnum, ulong>(100UL, out _), Is.False);
+	}
+
+	#endregion
+
+	[Test]
+	public void GetUnderlyingType_CorrectType()
+	{
+		Assert.That(Enumeration.GetUnderlyingType<ByteEnum>(), Is.EqualTo(typeof(byte)));
+		Assert.That(Enumeration.GetUnderlyingType<SByteEnum>(), Is.EqualTo(typeof(sbyte)));
+		Assert.That(Enumeration.GetUnderlyingType<ShortEnum>(), Is.EqualTo(typeof(short)));
+		Assert.That(Enumeration.GetUnderlyingType<UShortEnum>(), Is.EqualTo(typeof(ushort)));
+		Assert.That(Enumeration.GetUnderlyingType<IntEnum>(), Is.EqualTo(typeof(int)));
+		Assert.That(Enumeration.GetUnderlyingType<UIntEnum>(), Is.EqualTo(typeof(uint)));
+		Assert.That(Enumeration.GetUnderlyingType<LongEnum>(), Is.EqualTo(typeof(long)));
+		Assert.That(Enumeration.GetUnderlyingType<ULongEnum>(), Is.EqualTo(typeof(ulong)));
+	}
+
+	[Test]
+	public void GetValues_GetsAllTypedValues() =>
+		Assert.That(Enumeration.GetValues<StringSplitOptions>(), Is.EquivalentTo([
+			StringSplitOptions.None, StringSplitOptions.RemoveEmptyEntries, StringSplitOptions.TrimEntries
+		]));
+
+	#region GetValue
+
+	[Test]
+	public void GetValue_DefinedUnderlying_NumericValue()
+	{
+		Assert.That(Enumeration.GetValue<ByteEnum, byte>(ByteEnum.Two), Is.InstanceOf<byte>().And.EqualTo(1));
+		Assert.That(Enumeration.GetValue<SByteEnum, sbyte>(SByteEnum.Two), Is.InstanceOf<sbyte>().And.EqualTo(1));
+		Assert.That(Enumeration.GetValue<ShortEnum, short>(ShortEnum.Two), Is.InstanceOf<short>().And.EqualTo(1));
+		Assert.That(Enumeration.GetValue<UShortEnum, ushort>(UShortEnum.Two), Is.InstanceOf<ushort>().And.EqualTo(1));
+		Assert.That(Enumeration.GetValue<IntEnum, int>(IntEnum.Two), Is.InstanceOf<int>().And.EqualTo(1));
+		Assert.That(Enumeration.GetValue<UIntEnum, uint>(UIntEnum.Two), Is.InstanceOf<uint>().And.EqualTo(1));
+		Assert.That(Enumeration.GetValue<LongEnum, long>(LongEnum.Two), Is.InstanceOf<long>().And.EqualTo(1));
+		Assert.That(Enumeration.GetValue<ULongEnum, ulong>(ULongEnum.Two), Is.InstanceOf<ulong>().And.EqualTo(1));
+	}
+
+	[Test]
+	public void GetValue_NotOverflowingNotUnderlying_NumericValue()
+	{
+		decimal notOverflowing = Enumeration.GetValue<LongEnum, decimal>(LongEnum.Two);
+		Assert.That(notOverflowing, Is.InstanceOf<decimal>().And.EqualTo(1m));
+	}
+
+	[Test]
+	public void GetValue_OverflowingNotUnderlying_Exception() =>
+		Assert.That(() => Enumeration.GetValue<MaxEnum, byte>(MaxEnum.Max), Throws.InstanceOf<OverflowException>());
+
+	[Test]
+	public void GetValue_Undefined_Exception() =>
+		Assert.That(() => Enumeration.GetValue<StringComparison, int>((StringComparison)100), Throws.ArgumentException);
+
+	#endregion
+
+	#region TryGetValue
+
+	[Test]
+	public void TryGetValue_DefinedUnderlying_True()
+	{
+		Assert.That(Enumeration.TryGetValue(ByteEnum.Two, out byte? bValue), Is.True);
+		Assert.That(bValue, Is.InstanceOf<byte>().And.EqualTo(1));
+		Assert.That(Enumeration.TryGetValue(SByteEnum.Two, out sbyte? sbValue), Is.True);
+		Assert.That(sbValue, Is.InstanceOf<sbyte>().And.EqualTo(1));
+		Assert.That(Enumeration.TryGetValue(ShortEnum.Two, out short? sValue), Is.True);
+		Assert.That(sValue, Is.InstanceOf<short>().And.EqualTo(1));
+		Assert.That(Enumeration.TryGetValue(UShortEnum.Two, out ushort? usValue), Is.True);
+		Assert.That(usValue, Is.InstanceOf<ushort>().And.EqualTo(1));
+		Assert.That(Enumeration.TryGetValue(IntEnum.Two, out int? iValue), Is.True);
+		Assert.That(iValue, Is.InstanceOf<int>().And.EqualTo(1));
+		Assert.That(Enumeration.TryGetValue(UIntEnum.Two, out uint? uiValue), Is.True);
+		Assert.That(uiValue, Is.InstanceOf<uint>().And.EqualTo(1));
+		Assert.That(Enumeration.TryGetValue(LongEnum.Two, out long? lValue), Is.True);
+		Assert.That(lValue, Is.InstanceOf<long>().And.EqualTo(1));
+		Assert.That(Enumeration.TryGetValue(ULongEnum.Two, out ulong? ulValue), Is.True);
+		Assert.That(ulValue, Is.InstanceOf<ulong>().And.EqualTo(1));
+	}
+
+	[Test]
+	public void TryGetValue_NotOverflowingNotUnderlying_True()
+	{
+		Assert.That(Enumeration.TryGetValue(LongEnum.Two, out decimal? notUnderlying), Is.True);
+		Assert.That(notUnderlying, Is.EqualTo(1m));
+	}
+
+	[Test]
+	public void TryGetValue_OverflowingNotUnderlying_False() =>
+		Assert.That(Enumeration.TryGetValue(MaxEnum.Max, out byte? _), Is.False);
+
+	[Test]
+	public void TryGetValue_Undefined_False()
+	{
+		Assert.That(Enumeration.TryGetValue((StringComparison)100, out int? value), Is.False);
+		Assert.That(value, Is.Null);
+	}
+
+	#endregion
 }
