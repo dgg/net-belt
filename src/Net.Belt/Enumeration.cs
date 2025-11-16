@@ -187,6 +187,7 @@ public class Enumeration
 		}
 	}
 
+	[DoesNotReturn]
 	private static void throwNotDefined<TEnum>(TEnum value)
 	{
 		throw new ArgumentException(
@@ -194,6 +195,7 @@ public class Enumeration
 			nameof(value));
 	}
 
+	[DoesNotReturn]
 	private static void throwNotDefined<TEnum, TUnderlying>(TUnderlying underlying)
 	{
 		throw new ArgumentException(
@@ -201,6 +203,7 @@ public class Enumeration
 			nameof(underlying));
 	}
 
+	[DoesNotReturn]
 	private static void throwNotDeclared<TEnum>(string name)
 	{
 		throw new ArgumentException(
@@ -236,7 +239,7 @@ public class Enumeration
 			throwNotDefined(value);
 		}
 
-		return name!;
+		return name;
 	}
 
 	/// <summary>
@@ -257,7 +260,7 @@ public class Enumeration
 			throwNotDefined<TEnum, TUnderlying>(underlying);
 		}
 
-		return name!;
+		return name;
 	}
 
 	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
@@ -414,7 +417,7 @@ public class Enumeration
 	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
 	/// <typeparam name="TUnderlying">Integral type of the value.</typeparam>
 	/// <returns><c>true</c> if <paramref name="underlying"/> was retrieved successfully; otherwise, <c>false</c>.</returns>
-	public static bool TryGetValue<TEnum, TUnderlying>(TEnum value, [NotNullWhen(true)]out TUnderlying? underlying)
+	public static bool TryGetValue<TEnum, TUnderlying>(TEnum value, [NotNullWhen(true)] out TUnderlying? underlying)
 		where TEnum : struct, Enum
 		where TUnderlying : struct, INumber<TUnderlying>
 	{
@@ -433,6 +436,256 @@ public class Enumeration
 		}
 
 		return result;
+	}
+
+	#endregion
+
+	#region casting
+
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <typeparam name="TUnderlying">Integral type of the value.</typeparam>
+	/// <returns>An instance of the enumeration set to value.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
+	public static TEnum Cast<TEnum, TUnderlying>(TUnderlying underlying)
+		where TEnum : struct, Enum
+		where TUnderlying : struct, INumber<TUnderlying>
+	{
+		TEnum casted = (TEnum)(object)underlying;
+		AssertDefined(casted);
+		return casted;
+	}
+
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>An instance of the enumeration set to value.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
+	public static TEnum Cast<TEnum>(byte underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, byte>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <inheritdoc cref="Cast{TEnum}(byte)"/>
+	public static TEnum Cast<TEnum>(sbyte underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, sbyte>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <inheritdoc cref="Cast{TEnum}(byte)"/>
+	public static TEnum Cast<TEnum>(ushort underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, ushort>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <inheritdoc cref="Cast{TEnum}(byte)"/>
+	public static TEnum Cast<TEnum>(short underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, short>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <inheritdoc cref="Cast{TEnum}(byte)"/>
+	public static TEnum Cast<TEnum>(uint underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, uint>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <inheritdoc cref="Cast{TEnum}(byte)"/>
+	public static TEnum Cast<TEnum>(int underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, int>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <inheritdoc cref="Cast{TEnum}(byte)"/>
+	public static TEnum Cast<TEnum>(ulong underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, ulong>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <inheritdoc cref="Cast{TEnum}(byte)"/>
+	public static TEnum Cast<TEnum>(long underlying)
+		where TEnum : struct, Enum
+	{
+		bool success = TryCast(underlying, out TEnum? casted);
+		if (!success)
+		{
+			throwNotDefined<TEnum, long>(underlying);
+		}
+
+		return casted!.Value;
+	}
+
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
+	public static bool TryCast<TEnum>(byte underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
+	}
+
+	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	public static bool TryCast<TEnum>(sbyte underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
+	}
+
+	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	public static bool TryCast<TEnum>(ushort underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
+	}
+
+	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	public static bool TryCast<TEnum>(short underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
+	}
+
+	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	public static bool TryCast<TEnum>(uint underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
+	}
+
+	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	public static bool TryCast<TEnum>(int underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
+	}
+
+	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	public static bool TryCast<TEnum>(ulong underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
+	}
+
+	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	public static bool TryCast<TEnum>(long underlying, [NotNullWhen(true)] out TEnum? casted)
+		where TEnum : struct, Enum
+	{
+		casted = null;
+		bool success = IsDefined<TEnum>(underlying);
+		if (success)
+		{
+			casted = (TEnum)Enum.ToObject(typeof(TEnum), underlying);
+		}
+
+		return success;
 	}
 
 	#endregion
