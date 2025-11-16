@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
 namespace Net.Belt;
@@ -124,7 +125,7 @@ public class Enumeration
 	/// <summary>
 	/// Throws an exception if an enumerated value does not exist in a specified enumeration.
 	/// </summary>
-	/// <param name="underlying">The value or name of a constant in <typeparamref name="TEnum"/>.</param>
+	/// <param name="underlying">The value of a constant in <typeparamref name="TEnum"/>.</param>
 	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
 	/// <typeparam name="TUnderlying">Integral type of the value.</typeparam>
 	/// <exception cref="ArgumentException">If the <paramref name="underlying"/> is not in <typeparamref name="TEnum"/></exception>
@@ -141,35 +142,35 @@ public class Enumeration
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(byte underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, byte>(underlying);
-	
+
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(sbyte underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, sbyte>(underlying);
-	
+
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(ushort underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, ushort>(underlying);
-	
+
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(short underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, short>(underlying);
-	
+
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(uint underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, uint>(underlying);
-	
+
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(int underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, int>(underlying);
-	
+
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(ulong underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, ulong>(underlying);
-	
+
 	/// <inheritdoc cref="AssertDefined{TEnum,TUnderlying}"/>
 	public static void AssertDefined<TEnum>(long underlying) where TEnum : struct, Enum =>
 		AssertDefined<TEnum, long>(underlying);
-	
+
 	/// <summary>
 	/// Throws an exception if an enumerated value does not exist in a specified enumeration.
 	/// </summary>
@@ -199,7 +200,7 @@ public class Enumeration
 			$"The value of argument '{nameof(underlying)}' ({underlying}) is not defined for Enum type '{typeof(TEnum).Name}'.",
 			nameof(underlying));
 	}
-	
+
 	private static void throwNotDeclared<TEnum>(string name)
 	{
 		throw new ArgumentException(
@@ -208,6 +209,167 @@ public class Enumeration
 	}
 
 	#endregion
+
+	#endregion
+
+	#region names
+
+	/// <summary>
+	/// Retrieves an array of the names of the constants in a specified enumeration type.
+	/// </summary>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>A string array of the names of the constants in <typeparamref name="TEnum"/>.</returns>
+	public static string[] GetNames<TEnum>() where TEnum : struct, Enum => Enum.GetNames<TEnum>();
+
+	/// <summary>
+	/// Retrieves the name of the constant in the specified enumeration type that has the specified value.
+	/// </summary>
+	/// <param name="value">The value of a particular enumerated constant .</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>A string containing the name of the enumerated constant in <typeparamref name="TEnum"/> which value is <paramref name="value"/>.</returns>
+	/// <exception cref="ArgumentException">If the <paramref name="value"/> is not in <typeparamref name="TEnum"/></exception>
+	public static string GetName<TEnum>(TEnum value) where TEnum : struct, Enum
+	{
+		string? name = Enum.GetName(value);
+		if (name is null)
+		{
+			throwNotDefined(value);
+		}
+
+		return name!;
+	}
+
+	/// <summary>
+	/// Retrieves the name of the constant in the specified enumeration type that has the specified value.
+	/// </summary>
+	/// <param name="underlying">The value of a constant in <typeparamref name="TEnum"/>.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <typeparam name="TUnderlying">Integral type of the value.</typeparam>
+	/// <returns>A string containing the name of the enumerated constant in <typeparamref name="TEnum"/> which value is <paramref name="underlying"/>.</returns>
+	/// <exception cref="ArgumentException">If the <paramref name="underlying"/> is not in <typeparamref name="TEnum"/></exception>
+	public static string GetName<TEnum, TUnderlying>(TUnderlying underlying)
+		where TEnum : struct, Enum
+		where TUnderlying : struct, INumber<TUnderlying>
+	{
+		string? name = Enum.GetName(typeof(TEnum), underlying);
+		if (name is null)
+		{
+			throwNotDefined<TEnum, TUnderlying>(underlying);
+		}
+
+		return name!;
+	}
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(byte underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, byte>(underlying);
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(sbyte underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, sbyte>(underlying);
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(ushort underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, ushort>(underlying);
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(short underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, short>(underlying);
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(uint underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, uint>(underlying);
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(int underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, int>(underlying);
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(ulong underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, ulong>(underlying);
+
+	/// <inheritdoc cref="GetName{TEnum,TUnderlying}(TUnderlying)"/>
+	public static string GetName<TEnum>(long underlying)
+		where TEnum : struct, Enum =>
+		GetName<TEnum, long>(underlying);
+
+	/// <summary>
+	/// Retrieves the name of the constant in the specified enumeration type that has the specified value.
+	/// A return value indicates whether the retrieval succeeded.
+	/// </summary>
+	/// <param name="value">The value of a particular enumerated constant .</param>
+	/// <param name="name">A string containing the name of the enumerated constant in <typeparamref name="TEnum"/> which value is <paramref name="value"/>.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="value"/> was retrieved successfully; otherwise, <c>false</c>.</returns>
+	public static bool TryGetName<TEnum>(TEnum value, [NotNullWhen(true)] out string? name) where TEnum : struct, Enum
+	{
+		name = Enum.GetName(value);
+		return name is not null;
+	}
+
+	/// <summary>
+	/// Retrieves the name of the constant in the specified enumeration type that has the specified value.
+	/// A return value indicates whether the retrieval succeeded.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant .</param>
+	/// <param name="name">A string containing the name of the enumerated constant in <typeparamref name="TEnum"/> which value is <paramref name="underlying"/>.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <typeparam name="TUnderlying">Integral type of the value.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was retrieved successfully; otherwise, <c>false</c>.</returns>
+	public static bool TryGetName<TEnum, TUnderlying>(TUnderlying underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		where TUnderlying : struct, INumber<TUnderlying>
+	{
+		name = Enum.GetName(typeof(TEnum), underlying);
+		return name is not null;
+	}
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(byte underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, byte>(underlying, out name);
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(sbyte underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, sbyte>(underlying, out name);
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(ushort underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, ushort>(underlying, out name);
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(short underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, short>(underlying, out name);
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(uint underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, uint>(underlying, out name);
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(int underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, int>(underlying, out name);
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(ulong underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, ulong>(underlying, out name);
+
+	/// <inheritdoc cref="TryGetName{TEnum,TUnderlying}"/>
+	public static bool TryGetName<TEnum>(long underlying, [NotNullWhen(true)] out string? name)
+		where TEnum : struct, Enum
+		=> TryGetName<TEnum, long>(underlying, out name);
 
 	#endregion
 }
