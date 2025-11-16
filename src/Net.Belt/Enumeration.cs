@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
@@ -803,7 +804,22 @@ public class Enumeration
 		if (!result) throwNotDefined<TEnum, string>(value);
 		return parsed!.Value;
 	}
-		
 
 	#endregion
+	
+	/// <summary>
+	/// Removes the values specified by <paramref name="valuesToRemove"/> from the collection of <see cref="GetValues"/>
+	/// </summary>
+	/// <param name="valuesToRemove">An <see cref="IEnumerable{TEnum}"/> whose elements that also occur in the first sequence will cause those elements to be removed from the returned sequence.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>A sequence that contains the set difference of the elements of two sequences.</returns>
+	public static IEnumerable<TEnum> Omit<TEnum>(IEnumerable<TEnum> valuesToRemove) where TEnum : struct, Enum => GetValues<TEnum>().Except(valuesToRemove);
+
+	/// <summary>
+	/// Removes the values specified by <paramref name="valuesToRemove"/> from the collection of <see cref="GetValues"/>
+	/// </summary>
+	/// <param name="valuesToRemove">A collection whose elements that also occur in the first sequence will cause those elements to be removed from the returned sequence.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>A sequence that contains the set difference of the elements of two sequences.</returns>
+	public static IEnumerable<TEnum> Omit<TEnum>(params TEnum[] valuesToRemove) where TEnum : struct, Enum => Omit(valuesToRemove.AsEnumerable());
 }

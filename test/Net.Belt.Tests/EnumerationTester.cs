@@ -689,4 +689,29 @@ public class EnumerationTester
 	}
 
 	#endregion
+	
+	#region Omit
+
+	[Test]
+	public void Invert_Empty_OriginalValues()
+	{
+		var values = Enumeration.GetValues<StringSplitOptions>();
+		Assert.That(Enumeration.Omit<StringSplitOptions>(), Is.EquivalentTo(values));
+		Assert.That(Enumeration.Omit(Enumerable.Empty<StringSplitOptions>()), Is.EquivalentTo(values));
+	}
+
+	[Test]
+	public void Invert_AllValues_Empty() => Assert.That(Enumeration.Omit(Enumeration.GetValues<StringSplitOptions>()), Is.Empty);
+
+	[Test]
+	public void Invert_SomeValues_RemainingValues()
+	{
+		StringSplitOptions[] omitted = [StringSplitOptions.RemoveEmptyEntries, StringSplitOptions.TrimEntries];
+		Assert.That(Enumeration.Omit(StringSplitOptions.None), Is.EquivalentTo(omitted));
+		
+		IEnumerable<StringSplitOptions> toRemove = new List<StringSplitOptions> { StringSplitOptions.None };
+		Assert.That(Enumeration.Omit(toRemove), Is.EquivalentTo(omitted));
+	}
+
+	#endregion
 }
