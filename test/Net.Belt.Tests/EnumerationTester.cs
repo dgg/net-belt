@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 using Net.Belt.Tests.Support;
@@ -558,7 +559,7 @@ public class EnumerationTester
 	{
 		Assert.That(() => Enumeration.Cast<StringComparison>(100), Throws.ArgumentException);
 	}
-	
+
 	[Test]
 	public void Cast_Vs_ToObject()
 	{
@@ -610,6 +611,82 @@ public class EnumerationTester
 	[Test]
 	public void TryCast_UndefinedValue_False() =>
 		Assert.That(Enumeration.TryCast(100, out StringComparison? _), Is.False);
+
+	#endregion
+
+	#region Parse
+
+	[Test]
+	public void Parse_DefinedValue_Value()
+	{
+		Assert.That(Enumeration.Parse<ActionTargets>("Test"), Is.EqualTo(ActionTargets.Test));
+		Assert.That(Enumeration.Parse<ActionTargets>("TEst", true), Is.EqualTo(ActionTargets.Test));
+	}
+
+	[Test]
+	public void Parse_UndefinedValue_Exception()
+	{
+		Assert.That(() => Enumeration.Parse<ActionTargets>("nonExisting"), Throws.ArgumentException);
+		Assert.That(() => Enumeration.Parse<ActionTargets>("TEsT"), Throws.ArgumentException);
+		Assert.That(() => Enumeration.Parse<ActionTargets>("SuiTE", false), Throws.ArgumentException);
+	}
+
+	[Test]
+	public void Parse_DefinedNumericValue_Value() =>
+		Assert.That(Enumeration.Parse<StringComparison>("4"), Is.EqualTo(StringComparison.Ordinal));
+
+	[Test]
+	public void Parse_Empty_Exception() =>
+		Assert.That(() => Enumeration.Parse<ActionTargets>(string.Empty),
+			Throws.ArgumentException);
+
+	[Test]
+	public void Parse_UndefinedNumericValue_Exception()
+	{
+		Assert.That(() => Enumeration.Parse<ActionTargets>("100"), Throws.ArgumentException);
+	}
+
+	#endregion
+
+	#region TryParse
+
+	[Test]
+	public void TryParse_DefinedValue_True()
+	{
+		Assert.That(Enumeration.TryParse("Suite", out ActionTargets? parsed), Is.True);
+		Assert.That(parsed, Is.EqualTo(ActionTargets.Suite));
+
+		Assert.That(Enumeration.TryParse("SUiTe", true, out parsed), Is.True);
+		Assert.That(parsed, Is.EqualTo(ActionTargets.Suite));
+	}
+
+	[Test]
+	public void TryParse_UndefinedValue_False()
+	{
+		Assert.That(() => Enumeration.TryParse("nonExisting", out ActionTargets? _), Is.False);
+		Assert.That(() => Enumeration.TryParse("SUiTe", out ActionTargets? _), Is.False);
+		Assert.That(() => Enumeration.TryParse("SUiTe", false, out ActionTargets? _), Is.False);
+	}
+
+	[Test]
+	public void TryParse_DefinedNumericValue_True()
+	{
+		Assert.That(Enumeration.TryParse("4", out StringComparison? parsed), Is.True);
+		Assert.That(parsed, Is.EqualTo(StringComparison.Ordinal));
+	}
+
+	[Test]
+	public void TryParse_UndefinedNumericValue_False()
+	{
+		Assert.That(Enumeration.TryParse("100", out ActionTargets? parsed), Is.False);
+		Assert.That(parsed, Is.Null);
+	}
+
+	[Test]
+	public void TryParse_Empty_False()
+	{
+		Assert.That(Enumeration.TryParse(string.Empty, out ActionTargets? _), Is.False);
+	}
 
 	#endregion
 }

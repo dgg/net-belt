@@ -590,7 +590,14 @@ public class Enumeration
 		return success;
 	}
 
-	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
 	public static bool TryCast<TEnum>(sbyte underlying, [NotNullWhen(true)] out TEnum? casted)
 		where TEnum : struct, Enum
 	{
@@ -604,7 +611,14 @@ public class Enumeration
 		return success;
 	}
 
-	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
 	public static bool TryCast<TEnum>(ushort underlying, [NotNullWhen(true)] out TEnum? casted)
 		where TEnum : struct, Enum
 	{
@@ -618,7 +632,14 @@ public class Enumeration
 		return success;
 	}
 
-	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
 	public static bool TryCast<TEnum>(short underlying, [NotNullWhen(true)] out TEnum? casted)
 		where TEnum : struct, Enum
 	{
@@ -632,7 +653,14 @@ public class Enumeration
 		return success;
 	}
 
-	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
 	public static bool TryCast<TEnum>(uint underlying, [NotNullWhen(true)] out TEnum? casted)
 		where TEnum : struct, Enum
 	{
@@ -646,7 +674,14 @@ public class Enumeration
 		return success;
 	}
 
-	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
 	public static bool TryCast<TEnum>(int underlying, [NotNullWhen(true)] out TEnum? casted)
 		where TEnum : struct, Enum
 	{
@@ -660,7 +695,14 @@ public class Enumeration
 		return success;
 	}
 
-	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
 	public static bool TryCast<TEnum>(ulong underlying, [NotNullWhen(true)] out TEnum? casted)
 		where TEnum : struct, Enum
 	{
@@ -674,7 +716,14 @@ public class Enumeration
 		return success;
 	}
 
-	/// <inheritdoc cref="TryCast{TEnum}(byte, out TEnum?)"/>
+	/// <summary>
+	/// Converts the specified integral value to an enumeration member.
+	/// </summary>
+	/// <param name="underlying">The value of a particular enumerated constant.</param>
+	/// <param name="casted">An instance of the enumeration set to value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns><c>true</c> if <paramref name="underlying"/> was converted successfully; otherwise, <c>false</c>.</returns>
+	/// <exception cref="ArgumentException"><paramref name="underlying"/> is not defined in <typeparamref name="TEnum"/>.</exception>
 	public static bool TryCast<TEnum>(long underlying, [NotNullWhen(true)] out TEnum? casted)
 		where TEnum : struct, Enum
 	{
@@ -687,6 +736,74 @@ public class Enumeration
 
 		return success;
 	}
+
+	#endregion
+
+	#region parsing
+
+	/// <summary>
+	/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object.
+	/// The return value indicates whether the conversion succeeded.
+	/// </summary>
+	/// <param name="value">The case-sensitive string representation of the enumeration name or underlying value to convert.</param>
+	/// <param name="parsed">When this method returns, contains an object of type <typeparamref name="TEnum"/> whose value is represented by value if the parse operation succeeds.
+	/// If the parse operation fails, contains <c>null</c>.
+	/// This parameter is passed uninitialized.</param>
+	/// <typeparam name="TEnum">The enumeration type to which to convert value.</typeparam>
+	/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>
+	public static bool TryParse<TEnum>(string value, [NotNullWhen(true)] out TEnum? parsed) where TEnum : struct, Enum
+	{
+		parsed = null;
+		bool success = Enum.TryParse(value, out TEnum p) && IsDefined(p);
+		if (success)
+		{
+			parsed = p;
+		}
+
+		return success;
+	}
+
+	/// <summary>
+	/// Converts the string representation of the name or numeric value of one or more enumerated constants to an equivalent enumerated object.
+	/// A parameter specifies whether the operation is case-sensitive.
+	/// The return value indicates whether the conversion succeeded.
+	/// </summary>
+	/// <param name="value">The case-sensitive string representation of the enumeration name or underlying value to convert.</param>
+	/// <param name="ignoreCase"> true to ignore case; false to consider case.</param>
+	/// <param name="parsed">When this method returns, contains an object of type <typeparamref name="TEnum"/> whose value is represented by value if the parse operation succeeds.
+	/// If the parse operation fails, contains <c>null</c>.
+	/// This parameter is passed uninitialized.</param>
+	/// <typeparam name="TEnum">The enumeration type to which to convert value.</typeparam>
+	/// <returns><c>true</c> if the value parameter was converted successfully; otherwise, <c>false</c>.</returns>
+	public static bool TryParse<TEnum>(string value, bool ignoreCase, [NotNullWhen(true)] out TEnum? parsed)
+		where TEnum : struct, Enum
+	{
+		parsed = null;
+		bool success = Enum.TryParse(value, ignoreCase, out TEnum p) && IsDefined(p);
+		if (success)
+		{
+			parsed = p;
+		}
+
+		return success;
+	}
+
+	/// <summary>
+	/// Converts the string representation of the name or numeric value of one or more enumerated constants specified by TEnum to an equivalent enumerated object.
+	/// A parameter specifies whether the operation is case-insensitive.
+	/// </summary>
+	/// <param name="value">A string containing the name or value to convert.</param>
+	/// <param name="ignoreCase">true to ignore case; false to regard case.</param>
+	/// <typeparam name="TEnum">The enumeration type to which to convert value.</typeparam>
+	/// <returns>an object of type <typeparamref name="TEnum"/> whose value is represented by value if the parse operation succeeds.</returns>
+	/// <exception cref="ArgumentException"><paramref name="value"/> does not exist in <typeparamref name="TEnum"/>.</exception>
+	public static TEnum Parse<TEnum>(string value, bool ignoreCase = false) where TEnum : struct, Enum
+	{
+		bool result = TryParse(value, ignoreCase, out TEnum? parsed);
+		if (!result) throwNotDefined<TEnum, string>(value);
+		return parsed!.Value;
+	}
+		
 
 	#endregion
 }
