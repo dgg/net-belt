@@ -765,4 +765,228 @@ public class EnumerationTester
 		Assert.That(Enumeration.GetDescription(Attributed.Zero), Is.Null);
 
 	#endregion
+
+	#region IsFlags
+
+	[Test]
+	public void IsFlags_Flagged_True() => Assert.That(Enumeration.IsFlags<ZeroFlags>(), Is.True);
+
+	[Test]
+	public void IsFlags_NotFlagged_False() => Assert.That(Enumeration.IsFlags<IntEnum>(), Is.False);
+
+	#endregion
+
+	#region AssertFlags
+
+	[Test]
+	public void AssertFlags_Flagged_NoException() => Assert.That(Enumeration.AssertFlags<ZeroFlags>, Throws.Nothing);
+
+	[Test]
+	public void AssertFlags_NotFlagged_Exception() =>
+		Assert.That(Enumeration.AssertFlags<IntEnum>, Throws.ArgumentException
+			.With.Message.Contain("IntEnum"));
+
+	#endregion
+
+	#region SetFlag
+
+	[Test]
+	public void SetFlag_NotSetValue_ValueSet()
+	{
+		var fourNotSet = NoZeroFlags.Three;
+
+		Assert.That(fourNotSet.HasFlag(NoZeroFlags.Four), Is.False, "does not contain four initially");
+
+		NoZeroFlags fourSet = fourNotSet.SetFlag(NoZeroFlags.Four);
+
+		Assert.That(fourSet.HasFlag(NoZeroFlags.Four), Is.True, "later it does contain four");
+	}
+
+	[Test]
+	public void SetFlag_AlreadySetValue_ValueLeftAsSet()
+	{
+		NoZeroFlags fourAlreadySet = NoZeroFlags.Three | NoZeroFlags.Four;
+
+		Assert.That(fourAlreadySet.HasFlag(NoZeroFlags.Four), Is.True, "contains four initially");
+
+		fourAlreadySet = fourAlreadySet.SetFlag(NoZeroFlags.Four);
+
+		Assert.That(fourAlreadySet.HasFlag(NoZeroFlags.Four), Is.True, "still contains four");
+	}
+
+	[Test]
+	public void SetFlag_DoesNotMutateArgument()
+	{
+		NoZeroFlags fourNotSet = NoZeroFlags.Three;
+
+		Assert.That(fourNotSet.HasFlag(NoZeroFlags.Four), Is.False, "does not contain four initially");
+
+		fourNotSet.SetFlag(NoZeroFlags.Four); // no assignation
+
+		Assert.That(fourNotSet.HasFlag(NoZeroFlags.Four), Is.False, "no mutation");
+	}
+
+	[Test]
+	public void SetFlag_Zero_NoChange()
+	{
+		ZeroFlags twoAndThree = ZeroFlags.Two | ZeroFlags.Three;
+
+		Assert.That(twoAndThree.ToString(), Is.EqualTo("Two, Three"));
+		var noneExtra = twoAndThree.SetFlag(ZeroFlags.Zero);
+		Assert.That(noneExtra.ToString(), Is.EqualTo("Two, Three"));
+	}
+
+	[Test]
+	public void SetFlag_NoFlags_Exception() => Assert.That(() => IntEnum.One.SetFlag(IntEnum.Two), Throws.ArgumentException);
+
+	#endregion
+
+	#region UnsetFlag
+
+	[Test]
+	public void UnsetFlag_AlreadySetValue_RemovesItFromSetValues()
+	{
+		NoZeroFlags fourAlreadySet = NoZeroFlags.Three | NoZeroFlags.Four;
+
+		Assert.That(fourAlreadySet.HasFlag(NoZeroFlags.Four), Is.True);
+
+		var fourUnset = fourAlreadySet.UnsetFlag(NoZeroFlags.Four);
+
+		Assert.That(fourUnset.HasFlag(NoZeroFlags.Four), Is.False);
+		Assert.That(fourUnset.HasFlag(NoZeroFlags.Three), Is.True);
+	}
+
+	[Test]
+	public void UnsetFlag_NotSetValue_LeavesItUnset()
+	{
+		NoZeroFlags fourNotSet = NoZeroFlags.Three;
+
+		Assert.That(fourNotSet.HasFlag(NoZeroFlags.Four), Is.False);
+
+		var fourUnset = fourNotSet.UnsetFlag(NoZeroFlags.Four);
+
+		Assert.That(fourUnset.HasFlag(NoZeroFlags.Four), Is.False);
+		Assert.That(fourUnset.HasFlag(NoZeroFlags.Three), Is.True);
+	}
+
+	[Test]
+	public void UnsetFlag_DoesNotMutateArgument()
+	{
+		NoZeroFlags fourAlreadySet = NoZeroFlags.Three | NoZeroFlags.Four;
+
+		Assert.That(fourAlreadySet.HasFlag(NoZeroFlags.Four), Is.True);
+
+		fourAlreadySet.UnsetFlag(NoZeroFlags.Four);
+
+		Assert.That(fourAlreadySet.HasFlag(NoZeroFlags.Four), Is.True);
+	}
+
+	[Test]
+	public void UnsetFlag_Zero_NoChange()
+	{
+		ZeroFlags twoAndThree = ZeroFlags.Two | ZeroFlags.Three;
+
+		Assert.That(twoAndThree.ToString(), Is.EqualTo("Two, Three"));
+
+		var unsetNone = twoAndThree.UnsetFlag(ZeroFlags.Zero);
+		Assert.That(unsetNone.ToString(), Is.EqualTo("Two, Three"));
+	}
+
+	[Test]
+	public void UnsetFlag_NoFlags_Exception() => Assert.That(() => IntEnum.One.UnsetFlag(IntEnum.Two), Throws.ArgumentException);
+
+	#endregion
+
+	#region ToggleFlag
+
+	[Test]
+	public void ToggleFlag_NotSetValue_ValueSet()
+	{
+		var fourNotSet = NoZeroFlags.Three;
+
+		Assert.That(fourNotSet.HasFlag(NoZeroFlags.Four), Is.False);
+
+		var fourToggleFlagd = fourNotSet.ToggleFlag(NoZeroFlags.Four);
+
+		Assert.That(fourToggleFlagd.HasFlag(NoZeroFlags.Four), Is.True);
+	}
+
+	[Test]
+	public void ToggleFlag_AlreadySetValue_ValueUnset()
+	{
+		NoZeroFlags fourAlreadySet = NoZeroFlags.Three | NoZeroFlags.Four;
+
+		Assert.That(fourAlreadySet.HasFlag(NoZeroFlags.Four), Is.True);
+
+		var fourToggleFlag = fourAlreadySet.ToggleFlag(NoZeroFlags.Four);
+
+		Assert.That(fourToggleFlag.HasFlag(NoZeroFlags.Four), Is.False);
+	}
+
+	[Test]
+	public void ToggleFlag_DoesNotMutateArgument()
+	{
+		NoZeroFlags fourNotSet = NoZeroFlags.Three;
+
+		Assert.That(fourNotSet.HasFlag(NoZeroFlags.Four), Is.False);
+
+		fourNotSet.ToggleFlag(NoZeroFlags.Four);
+
+		Assert.That(fourNotSet.HasFlag(NoZeroFlags.Four), Is.False);
+	}
+
+	[Test]
+	public void ToggleFlag_Zero_NoChange()
+	{
+		ZeroFlags twoAndThree = ZeroFlags.Two | ZeroFlags.Three;
+
+		Assert.That(twoAndThree.ToString(), Is.EqualTo("Two, Three"));
+
+		var toggleFlagNone = twoAndThree.ToggleFlag(ZeroFlags.Zero);
+
+		Assert.That(toggleFlagNone.ToString(), Is.EqualTo("Two, Three"));
+	}
+
+	#endregion
+
+	#region GetFlags
+
+	[Test]
+	public void GetFlags_ReturnsSetFieldsInOrderOfDefinition()
+	{
+		NoZeroFlags nzf = NoZeroFlags.One | NoZeroFlags.Three;
+		Assert.That(nzf.GetFlags(true), Is.EquivalentTo(new[] { NoZeroFlags.One, NoZeroFlags.Three }));
+		Assert.That(nzf.GetFlags(false), Is.EquivalentTo(new[] { NoZeroFlags.One, NoZeroFlags.Three }));
+
+		nzf = NoZeroFlags.Four | NoZeroFlags.One;
+		Assert.That(nzf.GetFlags(true), Is.EquivalentTo(new[] { NoZeroFlags.One, NoZeroFlags.Four }));
+		Assert.That(nzf.GetFlags(false), Is.EquivalentTo(new[] { NoZeroFlags.One, NoZeroFlags.Four }));
+
+		ZeroFlags zf = ZeroFlags.One | ZeroFlags.Three;
+		Assert.That(zf.GetFlags(true), Is.EquivalentTo(new[] { ZeroFlags.One, ZeroFlags.Three }));
+		Assert.That(zf.GetFlags(false), Is.EquivalentTo(new[] { ZeroFlags.Zero, ZeroFlags.One, ZeroFlags.Three }));
+		Assert.That(zf.GetFlags(), Is.EquivalentTo(new[] { ZeroFlags.Zero, ZeroFlags.One, ZeroFlags.Three }));
+
+		zf = ZeroFlags.Four | ZeroFlags.One;
+		Assert.That(zf.GetFlags(true), Is.EquivalentTo(new[] { ZeroFlags.One, ZeroFlags.Four }));
+		Assert.That(zf.GetFlags(false), Is.EquivalentTo(new[] { ZeroFlags.Zero, ZeroFlags.One, ZeroFlags.Four }));
+		Assert.That(zf.GetFlags(), Is.EquivalentTo(new[] { ZeroFlags.Zero, ZeroFlags.One, ZeroFlags.Four }));
+	}
+
+	[Test]
+	public void GetFlags_DoesNotReturnUnsetFields()
+	{
+		NoZeroFlags nzf = NoZeroFlags.One | NoZeroFlags.Three;
+		Assert.That(nzf.GetFlags(),
+			Has.No.Member(NoZeroFlags.Two)
+				.And.No.Member(NoZeroFlags.Four));
+
+		ZeroFlags zf = ZeroFlags.One | ZeroFlags.Three;
+		Assert.That(zf.GetFlags(), Has
+			.No.Member(ZeroFlags.Two)
+			.And.No.Member(ZeroFlags.Four)
+			.And.Member(ZeroFlags.Zero));
+	}
+
+	#endregion
 }

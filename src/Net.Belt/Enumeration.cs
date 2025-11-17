@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
 
@@ -10,7 +11,7 @@ namespace Net.Belt;
 /// <summary>
 /// 
 /// </summary>
-public class Enumeration
+public static class Enumeration
 {
 	#region checking
 
@@ -875,6 +876,115 @@ public class Enumeration
 	/// <returns>A custom description, or <c>null</c> if not found.</returns>
 	public static string? GetDescription<TEnum>(TEnum value)
 		where TEnum : struct, Enum => GetAttribute<TEnum, DescriptionAttribute>(value)?.Description;
+
+	#endregion
+	
+	#region flags
+	
+	/// <summary>
+	/// Indicates that an enumeration can be treated as a bit field; that is, a set of flags.
+	/// </summary>
+	/// <typeparam name="TFlags">The type of the flags enumeration.</typeparam>
+	/// <returns><c>true</c> is the <typeparamref name="TFlags"/> is decorated with <see cref="FlagsAttribute"/>, <c>false</c> otherwise.</returns>
+	public static bool IsFlags<TFlags>() where TFlags : struct, Enum => typeof(TFlags).IsDefined(typeof(FlagsAttribute), false);
+
+	/// <summary>
+	/// Indicates that an enumeration can be treated as a bit field; that is, a set of flags.
+	/// </summary>
+	/// <typeparam name="TFlags">The type of the flags enumeration.</typeparam>
+	/// <exception cref="ArgumentException">If the <typeparamref name="TFlags"/> is not decorated with <see cref="FlagsAttribute"/>.</exception>
+	public static void AssertFlags<TFlags>() where TFlags : struct, Enum
+	{
+		if (!IsFlags<TFlags>())
+		{
+			throw new ArgumentException($"Enum '{typeof(TFlags).Name}' must have {nameof(FlagsAttribute)} applied to it.", nameof(TFlags));
+		}
+	}
+	
+	private static class Flags<TFlags> where TFlags : struct, Enum
+	{
+		internal static readonly Func<TFlags, TFlags, TFlags> BitwiseOr, BitwiseAnd;
+		internal static readonly Func<TFlags, TFlags> Not;
+		static Flags()
+		{
+			Type underlying = GetUnderlyingType<TFlags>();
+			Type tFlags = typeof(TFlags);
+			ParameterExpression param1 = Expression.Parameter(tFlags, "x");
+			ParameterExpression param2 = Expression.Parameter(tFlags, "y");
+			Expression convertedParam1 = Expression.Convert(param1, underlying);
+			Expression convertedParam2 = Expression.Convert(param2, underlying);
+
+			BitwiseOr = Expression.Lambda<Func<TFlags, TFlags, TFlags>>(
+					Expression.Convert(Expression.Or(convertedParam1, convertedParam2), tFlags), param1, param2)
+				.Compile();
+			BitwiseAnd = Expression.Lambda<Func<TFlags, TFlags, TFlags>>(
+					Expression.Convert(Expression.And(convertedParam1, convertedParam2), tFlags), param1, param2)
+				.Compile();
+			Not = Expression.Lambda<Func<TFlags, TFlags>>(
+					Expression.Convert(Expression.Not(convertedParam1), tFlags), param1)
+				.Compile();
+		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="flags"></param>
+	/// <param name="flagToSet"></param>
+	/// <typeparam name="TFlags"></typeparam>
+	/// <returns></returns>
+	public static TFlags SetFlag<TFlags>(this TFlags flags, TFlags flagToSet) where TFlags : struct, Enum
+	{
+		AssertFlags<TFlags>();
+		return Flags<TFlags>.BitwiseOr(flags, flagToSet);
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="flags"></param>
+	/// <param name="flagToSet"></param>
+	/// <typeparam name="TFlags"></typeparam>
+	/// <returns></returns>
+	public static TFlags UnsetFlag<TFlags>(this TFlags flags, TFlags flagToSet) where TFlags : struct, Enum
+	{
+		AssertFlags<TFlags>();
+		return Flags<TFlags>.BitwiseAnd(flags, Flags<TFlags>.Not(flagToSet));
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="flags"></param>
+	/// <param name="flagToToggle"></param>
+	/// <typeparam name="TFlags"></typeparam>
+	/// <returns></returns>
+	public static TFlags ToggleFlag<TFlags>(this TFlags flags, TFlags flagToToggle) where TFlags : struct, Enum
+	{
+		AssertFlags<TFlags>();
+		return flags.HasFlag(flagToToggle) ?
+			UnsetFlag(flags, flagToToggle) :
+			SetFlag(flags, flagToToggle);
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="flag"></param>
+	/// <param name="ignoreZeroValue"></param>
+	/// <typeparam name="TFlags"></typeparam>
+	/// <returns></returns>
+	public static IEnumerable<TFlags> GetFlags<TFlags>(this TFlags flag, bool ignoreZeroValue = false)
+		where TFlags : struct, Enum
+	{
+		AssertFlags<TFlags>();
+		// flags always have the default as the option with value zero (regardless of whether is defined or not)
+		// so ignoring the zero value means leaving out the default value altogether from the list of values
+		return GetValues<TFlags>()
+			// boxing, again
+			.Where(t => !(ignoreZeroValue && Equals(t, default(TFlags))))
+			.Where(t => flag.HasFlag(t));
+	}
 
 	#endregion
 }
