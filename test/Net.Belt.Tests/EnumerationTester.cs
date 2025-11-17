@@ -837,7 +837,8 @@ public class EnumerationTester
 	}
 
 	[Test]
-	public void SetFlag_NoFlags_Exception() => Assert.That(() => IntEnum.One.SetFlag(IntEnum.Two), Throws.ArgumentException);
+	public void SetFlag_NoFlags_Exception() =>
+		Assert.That(() => IntEnum.One.SetFlag(IntEnum.Two), Throws.ArgumentException);
 
 	#endregion
 
@@ -893,7 +894,8 @@ public class EnumerationTester
 	}
 
 	[Test]
-	public void UnsetFlag_NoFlags_Exception() => Assert.That(() => IntEnum.One.UnsetFlag(IntEnum.Two), Throws.ArgumentException);
+	public void UnsetFlag_NoFlags_Exception() =>
+		Assert.That(() => IntEnum.One.UnsetFlag(IntEnum.Two), Throws.ArgumentException);
 
 	#endregion
 
@@ -987,6 +989,51 @@ public class EnumerationTester
 			.And.No.Member(ZeroFlags.Four)
 			.And.Member(ZeroFlags.Zero));
 	}
+
+	#endregion
+
+	#region translations
+
+	[Test]
+	public void Translate_PossibleTranslation_DifferentType() => Assert.That(
+		Enumeration.Translate<ActionTargets, MyTargets>(ActionTargets.Suite), Is.EqualTo(MyTargets.Suite));
+
+	[Test]
+	public void Translate_ImpossibleTranslation_Exception() =>
+		Assert.That(() => Enumeration.Translate<ActionTargets, MyTargets>(ActionTargets.Test),
+			Throws.ArgumentException);
+
+	[Test]
+	public void TryTranslate_PossibleTranslation_DifferentType()
+	{
+		Assert.That(Enumeration.TryTranslate(ActionTargets.Suite, out MyTargets? translated), Is.True);
+		Assert.That(translated, Is.EqualTo(MyTargets.Suite));
+	}
+
+	[Test]
+	public void TryTranslate_ImpossibleTranslation_FalseAndNull()
+	{
+		Assert.That(Enumeration.TryTranslate(ActionTargets.Test, out MyTargets? translated), Is.False);
+		Assert.That(translated, Is.Null);
+	}
+
+	[Test]
+	public void TranslateWithDefault_PossibleTranslation_DifferentType() =>
+		Assert.That(Enumeration.Translate(ActionTargets.Suite, MyTargets.Default), Is.EqualTo(MyTargets.Suite));
+
+	[Test]
+	public void TranslateWithDefault_ImpossibleTranslation_Default() =>
+		Assert.That(Enumeration.Translate(ActionTargets.Test, MyTargets.Default), Is.EqualTo(MyTargets.Default));
+
+	#endregion
+	
+	#region GetComparer
+
+	[Test]
+	public void Comparer_Equal_True() => Assert.That(Enumeration.GetComparer<ByteEnum>().Equals(ByteEnum.One, ByteEnum.One), Is.True);
+
+	[Test]
+	public void Comparer_NotEqual_False() => Assert.That(Enumeration.GetComparer<ByteEnum>().Equals(ByteEnum.One, ByteEnum.Two), Is.False);
 
 	#endregion
 }

@@ -809,16 +809,17 @@ public static class Enumeration
 	}
 
 	#endregion
-	
+
 	#region omit
-	
+
 	/// <summary>
 	/// Removes the values specified by <paramref name="valuesToRemove"/> from the collection of <see cref="GetValues"/>
 	/// </summary>
 	/// <param name="valuesToRemove">An <see cref="IEnumerable{TEnum}"/> whose elements that also occur in the first sequence will cause those elements to be removed from the returned sequence.</param>
 	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
 	/// <returns>A sequence that contains the set difference of the elements of two sequences.</returns>
-	public static IEnumerable<TEnum> Omit<TEnum>(IEnumerable<TEnum> valuesToRemove) where TEnum : struct, Enum => GetValues<TEnum>().Except(valuesToRemove);
+	public static IEnumerable<TEnum> Omit<TEnum>(IEnumerable<TEnum> valuesToRemove) where TEnum : struct, Enum =>
+		GetValues<TEnum>().Except(valuesToRemove);
 
 	/// <summary>
 	/// Removes the values specified by <paramref name="valuesToRemove"/> from the collection of <see cref="GetValues"/>
@@ -826,12 +827,13 @@ public static class Enumeration
 	/// <param name="valuesToRemove">A collection whose elements that also occur in the first sequence will cause those elements to be removed from the returned sequence.</param>
 	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
 	/// <returns>A sequence that contains the set difference of the elements of two sequences.</returns>
-	public static IEnumerable<TEnum> Omit<TEnum>(params TEnum[] valuesToRemove) where TEnum : struct, Enum => Omit(valuesToRemove.AsEnumerable());
-	
+	public static IEnumerable<TEnum> Omit<TEnum>(params TEnum[] valuesToRemove) where TEnum : struct, Enum =>
+		Omit(valuesToRemove.AsEnumerable());
+
 	#endregion
-	
+
 	#region reflection
-	
+
 	/// <summary>
 	/// Searches for the public field with the specified enumeration value.
 	/// </summary>
@@ -878,15 +880,16 @@ public static class Enumeration
 		where TEnum : struct, Enum => GetAttribute<TEnum, DescriptionAttribute>(value)?.Description;
 
 	#endregion
-	
+
 	#region flags
-	
+
 	/// <summary>
 	/// Indicates that an enumeration can be treated as a bit field; that is, a set of flags.
 	/// </summary>
 	/// <typeparam name="TFlags">The type of the flags enumeration.</typeparam>
 	/// <returns><c>true</c> is the <typeparamref name="TFlags"/> is decorated with <see cref="FlagsAttribute"/>, <c>false</c> otherwise.</returns>
-	public static bool IsFlags<TFlags>() where TFlags : struct, Enum => typeof(TFlags).IsDefined(typeof(FlagsAttribute), false);
+	public static bool IsFlags<TFlags>() where TFlags : struct, Enum =>
+		typeof(TFlags).IsDefined(typeof(FlagsAttribute), false);
 
 	/// <summary>
 	/// Indicates that an enumeration can be treated as a bit field; that is, a set of flags.
@@ -897,14 +900,16 @@ public static class Enumeration
 	{
 		if (!IsFlags<TFlags>())
 		{
-			throw new ArgumentException($"Enum '{typeof(TFlags).Name}' must have {nameof(FlagsAttribute)} applied to it.", nameof(TFlags));
+			throw new ArgumentException(
+				$"Enum '{typeof(TFlags).Name}' must have {nameof(FlagsAttribute)} applied to it.", nameof(TFlags));
 		}
 	}
-	
+
 	private static class Flags<TFlags> where TFlags : struct, Enum
 	{
 		internal static readonly Func<TFlags, TFlags, TFlags> BitwiseOr, BitwiseAnd;
 		internal static readonly Func<TFlags, TFlags> Not;
+
 		static Flags()
 		{
 			Type underlying = GetUnderlyingType<TFlags>();
@@ -962,9 +967,7 @@ public static class Enumeration
 	public static TFlags ToggleFlag<TFlags>(this TFlags flags, TFlags flagToToggle) where TFlags : struct, Enum
 	{
 		AssertFlags<TFlags>();
-		return flags.HasFlag(flagToToggle) ?
-			UnsetFlag(flags, flagToToggle) :
-			SetFlag(flags, flagToToggle);
+		return flags.HasFlag(flagToToggle) ? UnsetFlag(flags, flagToToggle) : SetFlag(flags, flagToToggle);
 	}
 
 	/// <summary>
@@ -985,6 +988,131 @@ public static class Enumeration
 			.Where(t => !(ignoreZeroValue && Equals(t, default(TFlags))))
 			.Where(t => flag.HasFlag(t));
 	}
+
+	#endregion
+
+	#region translation
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="source"></param>
+	/// <param name="ignoreCase"></param>
+	/// <typeparam name="TSource"></typeparam>
+	/// <typeparam name="TTarget"></typeparam>
+	/// <returns></returns>
+	public static TTarget Translate<TSource, TTarget>(TSource source, bool ignoreCase = false)
+		where TSource : struct, Enum
+		where TTarget : struct, Enum =>
+		Parse<TTarget>(source.ToString(), ignoreCase);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="source"></param>
+	/// <param name="translated"></param>
+	/// <param name="ignoreCase"></param>
+	/// <typeparam name="TSource"></typeparam>
+	/// <typeparam name="TTarget"></typeparam>
+	/// <returns></returns>
+	public static bool TryTranslate<TSource, TTarget>(TSource source, out TTarget? translated, bool ignoreCase = false)
+		where TSource : struct, Enum
+		where TTarget : struct, Enum =>
+		TryParse(source.ToString(), ignoreCase, out translated);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="source"></param>
+	/// <param name="defaultValue"></param>
+	/// <param name="ignoreCase"></param>
+	/// <typeparam name="TSource"></typeparam>
+	/// <typeparam name="TTarget"></typeparam>
+	/// <returns></returns>
+	public static TTarget Translate<TSource, TTarget>(TSource source, TTarget defaultValue, bool ignoreCase = false)
+		where TSource : struct, Enum
+		where TTarget : struct, Enum
+	{
+		TryParse(source.ToString(), ignoreCase, out TTarget? translated);
+		return translated.GetValueOrDefault(defaultValue);
+	}
+
+	#endregion
+
+	#region fast comparison
+
+	[SuppressMessage("Style", "IDE1006:Naming Styles")]
+	internal class FastEnumComparer<TEnum> : IEqualityComparer<TEnum>
+		where TEnum : struct, IComparable, IFormattable, IConvertible
+	{
+		public static readonly IEqualityComparer<TEnum> Instance;
+
+		private static readonly Func<TEnum, TEnum, bool> equals;
+		private static readonly Func<TEnum, int> getHashCode;
+
+		static FastEnumComparer()
+		{
+			getHashCode = generateGetHashCode();
+			equals = generateEquals();
+			Instance = new FastEnumComparer<TEnum>();
+		}
+
+		/// <summary>
+		/// A private constructor to prevent user instantiation.
+		/// </summary>
+		private FastEnumComparer() => assertUnderlyingTypeIsSupported();
+
+		// call the generated method
+		public bool Equals(TEnum x, TEnum y) => equals(x, y);
+
+		// call the generated method
+		public int GetHashCode(TEnum obj) => getHashCode(obj);
+
+		private static void assertUnderlyingTypeIsSupported()
+		{
+			var underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
+			ICollection<Type> supportedTypes =
+			[
+				typeof(byte), typeof(sbyte),
+				typeof(short), typeof(ushort),
+				typeof(int), typeof(uint),
+				typeof(long), typeof(ulong)
+			];
+
+			if (!supportedTypes.Contains(underlyingType))
+			{
+				string typeNames = string.Join(", ", supportedTypes.Select(t => t.Name));
+				throw new NotSupportedException(
+					$"The underlying type of '{typeof(TEnum).Name}' is {underlyingType.Name}. Only enums with underlying type of [{typeNames}] are supported.");
+			}
+		}
+
+		private static Func<TEnum, TEnum, bool> generateEquals()
+		{
+			var xParam = Expression.Parameter(typeof(TEnum), "x");
+			var yParam = Expression.Parameter(typeof(TEnum), "y");
+			var equalExpression = Expression.Equal(xParam, yParam);
+			return Expression.Lambda<Func<TEnum, TEnum, bool>>(equalExpression, xParam, yParam).Compile();
+		}
+
+		private static Func<TEnum, int> generateGetHashCode()
+		{
+			var objParam = Expression.Parameter(typeof(TEnum), "obj");
+			var underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
+			var convertExpression = Expression.Convert(objParam, underlyingType);
+			var getHashCodeMethod = underlyingType.GetTypeInfo().GetMethod("GetHashCode");
+			var getHashCodeExpression = Expression.Call(convertExpression, getHashCodeMethod!);
+			return Expression.Lambda<Func<TEnum, int>>(getHashCodeExpression, new[] { objParam }).Compile();
+		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="TEnum"></typeparam>
+	/// <returns></returns>
+	public static IEqualityComparer<TEnum> GetComparer<TEnum>() where TEnum : struct, Enum =>
+		FastEnumComparer<TEnum>.Instance;
 
 	#endregion
 }
