@@ -13,9 +13,6 @@ namespace Net.Belt.Tests;
 public class EnumerationShowcase
 {
 	[Test]
-	public void Fail() => Assert.Fail("break CI");
-
-	[Test]
 	public void Definition()
 	{
 		PlatformID platform = PlatformID.MacOSX;
