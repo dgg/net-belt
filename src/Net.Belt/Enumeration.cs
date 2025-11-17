@@ -1,7 +1,5 @@
 using System.ComponentModel;
-using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
@@ -9,7 +7,7 @@ using System.Reflection;
 namespace Net.Belt;
 
 /// <summary>
-/// 
+/// Provides helper methods for working with enumeration types (enum).
 /// </summary>
 public static class Enumeration
 {
@@ -932,12 +930,12 @@ public static class Enumeration
 	}
 
 	/// <summary>
-	/// 
+	/// Sets the specified flag on the provided flags value.
 	/// </summary>
-	/// <param name="flags"></param>
-	/// <param name="flagToSet"></param>
-	/// <typeparam name="TFlags"></typeparam>
-	/// <returns></returns>
+	/// <param name="flags">The flags value.</param>
+	/// <param name="flagToSet">The flag to set.</param>
+	/// <typeparam name="TFlags">The enum type decorated with <see cref="FlagsAttribute"/>.</typeparam>
+	/// <returns>The resulting flags value after setting the specified flag.</returns>
 	public static TFlags SetFlag<TFlags>(this TFlags flags, TFlags flagToSet) where TFlags : struct, Enum
 	{
 		AssertFlags<TFlags>();
@@ -945,12 +943,12 @@ public static class Enumeration
 	}
 
 	/// <summary>
-	/// 
+	/// Removes the specified flag from the provided flags value.
 	/// </summary>
-	/// <param name="flags"></param>
-	/// <param name="flagToSet"></param>
-	/// <typeparam name="TFlags"></typeparam>
-	/// <returns></returns>
+	/// <param name="flags">The flags value.</param>
+	/// <param name="flagToSet">The flag to remove.</param>
+	/// <typeparam name="TFlags">The enum type decorated with <see cref="FlagsAttribute"/>.</typeparam>
+	/// <returns>The resulting flags value after removing the specified flag.</returns>
 	public static TFlags UnsetFlag<TFlags>(this TFlags flags, TFlags flagToSet) where TFlags : struct, Enum
 	{
 		AssertFlags<TFlags>();
@@ -958,12 +956,12 @@ public static class Enumeration
 	}
 
 	/// <summary>
-	/// 
+	/// Toggles the specified flag on the provided flags value.
 	/// </summary>
-	/// <param name="flags"></param>
-	/// <param name="flagToToggle"></param>
-	/// <typeparam name="TFlags"></typeparam>
-	/// <returns></returns>
+	/// <param name="flags">The flags value.</param>
+	/// <param name="flagToToggle">The flag to toggle.</param>
+	/// <typeparam name="TFlags">The enum type decorated with <see cref="FlagsAttribute"/>.</typeparam>
+	/// <returns>The resulting flags value after toggling the specified flag.</returns>
 	public static TFlags ToggleFlag<TFlags>(this TFlags flags, TFlags flagToToggle) where TFlags : struct, Enum
 	{
 		AssertFlags<TFlags>();
@@ -971,12 +969,13 @@ public static class Enumeration
 	}
 
 	/// <summary>
-	/// 
+	/// Returns the individual flag values that are set on the provided flags value.
 	/// </summary>
-	/// <param name="flag"></param>
-	/// <param name="ignoreZeroValue"></param>
-	/// <typeparam name="TFlags"></typeparam>
-	/// <returns></returns>
+	/// <param name="flag">The flags value to inspect.</param>
+	/// <param name="ignoreZeroValue">If <c>true</c>, the zero/default value (if present among enum values) will be omitted from the returned sequence.</param>
+	/// <typeparam name="TFlags">The enum type decorated with <see cref="FlagsAttribute"/>.</typeparam>
+	/// <returns>An <see cref="IEnumerable{TFlags}"/> containing each flag value that is set on <paramref name="flag"/>.</returns>
+	/// <exception cref="ArgumentException">Thrown if <typeparamref name="TFlags"/> is not a flags enum.</exception>
 	public static IEnumerable<TFlags> GetFlags<TFlags>(this TFlags flag, bool ignoreZeroValue = false)
 		where TFlags : struct, Enum
 	{
@@ -994,41 +993,43 @@ public static class Enumeration
 	#region translation
 
 	/// <summary>
-	/// 
+	/// Translates the specified <paramref name="source"/> enum value to the target enum type by matching names.
 	/// </summary>
-	/// <param name="source"></param>
-	/// <param name="ignoreCase"></param>
-	/// <typeparam name="TSource"></typeparam>
-	/// <typeparam name="TTarget"></typeparam>
-	/// <returns></returns>
+	/// <param name="source">The source enum value to translate.</param>
+	/// <param name="ignoreCase">Whether the translation should ignore case when matching names.</param>
+	/// <typeparam name="TSource">The source enum type.</typeparam>
+	/// <typeparam name="TTarget">The target enum type.</typeparam>
+	/// <returns>The translated <typeparamref name="TTarget"/> value.</returns>
+	/// <exception cref="ArgumentException">If the translated name does not exist in <typeparamref name="TTarget"/>.</exception>
 	public static TTarget Translate<TSource, TTarget>(TSource source, bool ignoreCase = false)
 		where TSource : struct, Enum
 		where TTarget : struct, Enum =>
 		Parse<TTarget>(source.ToString(), ignoreCase);
 
 	/// <summary>
-	/// 
+	/// Attempts to translate the specified <paramref name="source"/> enum value to the target enum type.
 	/// </summary>
-	/// <param name="source"></param>
-	/// <param name="translated"></param>
-	/// <param name="ignoreCase"></param>
-	/// <typeparam name="TSource"></typeparam>
-	/// <typeparam name="TTarget"></typeparam>
-	/// <returns></returns>
+	/// <param name="source">The source enum value to translate.</param>
+	/// <param name="translated">When this method returns, contains the translated value if the translation succeeded; otherwise, <c>null</c>.</param>
+	/// <param name="ignoreCase">Whether the translation should ignore case when matching names.</param>
+	/// <typeparam name="TSource">The source enum type.</typeparam>
+	/// <typeparam name="TTarget">The target enum type.</typeparam>
+	/// <returns><c>true</c> if translation succeeded; otherwise, <c>false</c>.</returns>
 	public static bool TryTranslate<TSource, TTarget>(TSource source, out TTarget? translated, bool ignoreCase = false)
 		where TSource : struct, Enum
 		where TTarget : struct, Enum =>
 		TryParse(source.ToString(), ignoreCase, out translated);
 
 	/// <summary>
-	/// 
+	/// Attempts to translate the specified <paramref name="source"/> enum value to the target enum type and returns the translated value
+	/// or the provided <paramref name="defaultValue"/> when translation fails.
 	/// </summary>
-	/// <param name="source"></param>
-	/// <param name="defaultValue"></param>
-	/// <param name="ignoreCase"></param>
-	/// <typeparam name="TSource"></typeparam>
-	/// <typeparam name="TTarget"></typeparam>
-	/// <returns></returns>
+	/// <param name="source">The source enum value to translate.</param>
+	/// <param name="defaultValue">The default value to return if translation fails.</param>
+	/// <param name="ignoreCase">Whether the translation should ignore case when matching names.</param>
+	/// <typeparam name="TSource">The source enum type.</typeparam>
+	/// <typeparam name="TTarget">The target enum type.</typeparam>
+	/// <returns>The translated <typeparamref name="TTarget"/> value or <paramref name="defaultValue"/> if translation failed.</returns>
 	public static TTarget Translate<TSource, TTarget>(TSource source, TTarget defaultValue, bool ignoreCase = false)
 		where TSource : struct, Enum
 		where TTarget : struct, Enum
@@ -1107,10 +1108,10 @@ public static class Enumeration
 	}
 
 	/// <summary>
-	/// 
+	/// Returns an equality comparer optimized for the enum type <typeparamref name="TEnum"/>.
 	/// </summary>
-	/// <typeparam name="TEnum"></typeparam>
-	/// <returns></returns>
+	/// <typeparam name="TEnum">The enum type to compare.</typeparam>
+	/// <returns>An <see cref="IEqualityComparer{TEnum}"/> that efficiently compares values of <typeparamref name="TEnum"/>.</returns>
 	public static IEqualityComparer<TEnum> GetComparer<TEnum>() where TEnum : struct, Enum =>
 		FastEnumComparer<TEnum>.Instance;
 
