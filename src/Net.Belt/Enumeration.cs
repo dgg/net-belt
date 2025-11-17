@@ -1,7 +1,9 @@
 using System.ComponentModel;
 using System.Data.SqlTypes;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Numerics;
+using System.Reflection;
 
 namespace Net.Belt;
 
@@ -807,6 +809,8 @@ public class Enumeration
 
 	#endregion
 	
+	#region omit
+	
 	/// <summary>
 	/// Removes the values specified by <paramref name="valuesToRemove"/> from the collection of <see cref="GetValues"/>
 	/// </summary>
@@ -822,4 +826,55 @@ public class Enumeration
 	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
 	/// <returns>A sequence that contains the set difference of the elements of two sequences.</returns>
 	public static IEnumerable<TEnum> Omit<TEnum>(params TEnum[] valuesToRemove) where TEnum : struct, Enum => Omit(valuesToRemove.AsEnumerable());
+	
+	#endregion
+	
+	#region reflection
+	
+	/// <summary>
+	/// Searches for the public field with the specified enumeration value.
+	/// </summary>
+	/// <param name="value">The enumeration value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>An object representing the public field with the specified name.</returns>
+	public static FieldInfo GetField<TEnum>(TEnum value) where TEnum : struct, Enum
+	{
+		AssertDefined(value);
+		string name = value.ToString();
+		return typeof(TEnum).GetField(name)!;
+	}
+
+	/// <summary>
+	/// Indicates whether custom attributes of a specified type are applied to a specified enumeration value.
+	/// </summary>
+	/// <param name="value">The enumeration value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <typeparam name="TAttribute">The type of attribute to search for.</typeparam>
+	/// <returns><c>true</c> if an attribute of the specified type is applied to value; otherwise, <c>false</c>.</returns>
+	public static bool HasAttribute<TEnum, TAttribute>(TEnum value)
+		where TEnum : struct, Enum
+		where TAttribute : Attribute =>
+		GetField(value).IsDefined(typeof(TAttribute));
+
+	/// <summary>
+	/// Retrieves a custom attribute of a specified type that is applied to an enumeration value.
+	/// </summary>
+	/// <param name="value">The enumeration value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <typeparam name="TAttribute">The type of attribute to search for.</typeparam>
+	/// <returns>A custom attribute that matches <typeparamref name="TAttribute"/>, or <c>null</c> if no such attribute is found.</returns>
+	public static TAttribute? GetAttribute<TEnum, TAttribute>(TEnum value)
+		where TEnum : struct, Enum
+		where TAttribute : Attribute => GetField(value).GetCustomAttribute<TAttribute>();
+
+	/// <summary>
+	/// Retrieves a custom description that is applied to an enumeration value.
+	/// </summary>
+	/// <param name="value">The enumeration value.</param>
+	/// <typeparam name="TEnum">The type of the enumeration.</typeparam>
+	/// <returns>A custom description, or <c>null</c> if not found.</returns>
+	public static string? GetDescription<TEnum>(TEnum value)
+		where TEnum : struct, Enum => GetAttribute<TEnum, DescriptionAttribute>(value)?.Description;
+
+	#endregion
 }

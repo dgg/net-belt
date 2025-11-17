@@ -1,7 +1,9 @@
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 using Net.Belt.Tests.Support;
+
+using Desc = System.ComponentModel.DescriptionAttribute;
 
 namespace Net.Belt.Tests;
 
@@ -689,7 +691,7 @@ public class EnumerationTester
 	}
 
 	#endregion
-	
+
 	#region Omit
 
 	[Test]
@@ -701,17 +703,66 @@ public class EnumerationTester
 	}
 
 	[Test]
-	public void Invert_AllValues_Empty() => Assert.That(Enumeration.Omit(Enumeration.GetValues<StringSplitOptions>()), Is.Empty);
+	public void Invert_AllValues_Empty() =>
+		Assert.That(Enumeration.Omit(Enumeration.GetValues<StringSplitOptions>()), Is.Empty);
 
 	[Test]
 	public void Invert_SomeValues_RemainingValues()
 	{
 		StringSplitOptions[] omitted = [StringSplitOptions.RemoveEmptyEntries, StringSplitOptions.TrimEntries];
 		Assert.That(Enumeration.Omit(StringSplitOptions.None), Is.EquivalentTo(omitted));
-		
+
 		IEnumerable<StringSplitOptions> toRemove = new List<StringSplitOptions> { StringSplitOptions.None };
 		Assert.That(Enumeration.Omit(toRemove), Is.EquivalentTo(omitted));
 	}
+
+	#endregion
+
+	#region GetField
+
+	[Test]
+	public void GetField_Defined_FieldInfo()
+	{
+		FieldInfo field = Enumeration.GetField(StringSplitOptions.RemoveEmptyEntries);
+		Assert.That(field.Name, Is.EqualTo(nameof(StringSplitOptions.RemoveEmptyEntries)));
+	}
+
+	[Test]
+	public void GetField_Undefined_Exception() =>
+		Assert.That(() => Enumeration.GetField((StringSplitOptions)100), Throws.ArgumentException);
+
+	#endregion
+
+	#region HasAttribute
+
+	[Test]
+	public void HasAttribute_ExistingAttribute_True() =>
+		Assert.That(Enumeration.HasAttribute<Attributed, Desc>(Attributed.SubZero), Is.True);
+
+	[Test]
+	public void HasAttributeGetAttribute_MissingAttribute_False() =>
+		Assert.That(Enumeration.HasAttribute<Attributed, TestAttribute>(Attributed.SubZero), Is.False);
+
+	#endregion
+
+	#region GetAttribute
+
+	[Test]
+	public void GetAttribute_ExistingAttribute_InstanceObtained() => Assert.That(
+		Enumeration.GetAttribute<Attributed, Desc>(Attributed.SubZero),
+		Is.Not.Null.And.Property("Description").EqualTo("Sub-Zero"));
+
+	[Test]
+	public void GetAttribute_MissingAttribute_Null() =>
+		Assert.That(Enumeration.GetAttribute<Attributed, TestAttribute>(Attributed.SubZero), Is.Null);
+
+	[Test]
+	public void GetDescription_ExistingAttribute_Description() =>
+		Assert.That(Enumeration.GetDescription(Attributed.SubZero), Is.EqualTo("Sub-Zero"));
+
+	[Test]
+	public void GetDescription_MissingAttribute_Null() =>
+		Assert.That(Enumeration.GetDescription(Attributed.Zero), Is.Null);
 
 	#endregion
 }
