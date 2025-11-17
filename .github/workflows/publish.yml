@@ -74,29 +74,6 @@ jobs:
 
       - run: echo "☑ status is ${{ job.status }}"
 
-  push_gh_package:
-    needs: build_and_publish
-    runs-on: ubuntu-latest
-    environment: github_feed
-    steps:
-      - name: download package
-        uses: actions/download-artifact@v6
-        with:
-          name: package
-
-      - name: setup dotnet for pushing
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: ${{needs.build_and_publish.outputs.DOTNET_VERSION}}
-
-      - name: configure nuget
-        run: 
-          dotnet nuget add source --username ${{ github.actor }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.actor }}/index.json"
-
-      - name: push to gh feed
-        id: push_to_gh_feed
-        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source github
-
   push_nuget_package:
     needs: build_and_publish
     runs-on: ubuntu-latest
