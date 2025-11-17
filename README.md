@@ -1,17 +1,15 @@
 # Net-Belt
-[![Latest Package](https://img.shields.io/nuget/v/net-belt?style=flat-square&logo=nuget&label=Net-Belt)](https://www.nuget.org/packages/net-belt/)
-[![Latest Release](https://img.shields.io/github/v/release/dgg/net-belt?style=flat-square&logo=github&label=Net-Belt&color=25c2a0)](https://github.com/dgg/net-belt/releases/)
-[![Code Coverage](https://img.shields.io/codecov/c/gh/dgg/net-belt?style=flat-square&logo=codecov&label=Net-Belt)](https://codecov.io/gh/dgg/net-belt)
+[![Latest Package](https://img.shields.io/nuget/v/Net.Belt?style=flat-square&logo=nuget&label=Net.Belt&color=3498db)](https://www.nuget.org/packages/Net.Belt/)
+[![Latest Release](https://img.shields.io/github/v/release/dgg/net-belt?style=flat-square&logo=github&label=Net-Belt&color=1abc9c&include_prereleases)](https://github.com/dgg/net-belt/releases/)
+[![Code Coverage](https://img.shields.io/codecov/c/gh/dgg/net-belt?style=flat-square&logo=codecov&label=Net-Belt&color=f07)](https://codecov.io/gh/dgg/net-belt)
 
 [![Code Coverage](https://img.shields.io/badge/Conventional-Commits-FE5196?style=flat-square&logo=conventionalcommits)](https://conventionalcommits.org)
 
 Helpers, value objects, pattern implementations... and a bag of chips
 
 ## From Vertica.Utilities to Net-Belt
-[![Latest Package](https://img.shields.io/nuget/v/Vertica.Utilities?style=flat-square&logo=nuget&label=Vertica.Utilities
-)](https://www.nuget.org/packages/Vertica.Utilities/)
-[![Source Code](https://img.shields.io/badge/x-Repo-blue?style=flat-square&logo=github&label=Vertica.Utilities&color=lightgrey
-)](https://github.com/Solar-AS/Vertica.Utilities/)
+[![Latest Package](https://img.shields.io/nuget/v/Vertica.Utilities?style=flat-square&logo=nuget&label=Vertica.Utilities&color=2980b9)](https://www.nuget.org/packages/Vertica.Utilities/)
+[![Source Code](https://img.shields.io/badge/x-Repo-blue?style=flat-square&logo=github&label=Vertica.Utilities&color=7f8c8d)](https://github.com/Solar-AS/Vertica.Utilities/)
 
 
 
