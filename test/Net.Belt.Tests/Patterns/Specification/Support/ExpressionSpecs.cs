@@ -1,6 +1,6 @@
-using Net.Belt.Patterns;
+using Net.Belt.Patterns.Specification;
 
-namespace Net.Belt.Tests.Patterns.Support;
+namespace Net.Belt.Tests.Patterns.Specification.Support;
 
 internal class LessThan10ExpSpecSubject() : ExpressionSpecification<int>(i => i < 10);
 

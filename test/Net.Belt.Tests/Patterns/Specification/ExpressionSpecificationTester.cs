@@ -1,12 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-using Net.Belt.Patterns;
-using Net.Belt.Tests.Patterns.Support;
+using Net.Belt.Patterns.Specification;
+using Net.Belt.Tests.Patterns.Specification.Support;
 
-using Iz = Net.Belt.Tests.Patterns.Support.Iz;
+using Iz = Net.Belt.Tests.Patterns.Specification.Support.Iz;
 
-namespace Net.Belt.Tests.Patterns;
+namespace Net.Belt.Tests.Patterns.Specification;
 
 [TestFixture]
 [SuppressMessage("ReSharper", "ConvertToLocalFunction")]

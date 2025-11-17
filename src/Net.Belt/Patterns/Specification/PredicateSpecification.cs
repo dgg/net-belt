@@ -1,4 +1,4 @@
-namespace Net.Belt.Patterns;
+namespace Net.Belt.Patterns.Specification;
 
 /// <summary>
 /// Represents a concrete implementation of the Specification design pattern that evaluates

@@ -1,4 +1,4 @@
-namespace Net.Belt.Patterns;
+namespace Net.Belt.Patterns.Specification;
 
 /// <summary>
 /// Defines a contract for constructing specifications that encapsulate business rules

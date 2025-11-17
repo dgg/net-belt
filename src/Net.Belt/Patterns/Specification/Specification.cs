@@ -1,4 +1,4 @@
-namespace Net.Belt.Patterns;
+namespace Net.Belt.Patterns.Specification;
 
 /// <summary>
 /// Represents a base class for specifications in the specification design pattern.

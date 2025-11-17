@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Net.Belt.Tests.Patterns.Support;
+namespace Net.Belt.Tests.Patterns.Specification.Support;
 
 internal class ComplexContainer : IEnumerable<ComplexType>
 {

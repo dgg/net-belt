@@ -1,4 +1,4 @@
-namespace Net.Belt.Tests.Patterns.Support;
+namespace Net.Belt.Tests.Patterns.Specification.Support;
 
 internal class ComplexType(bool enabled, string foo, int bar)
 {

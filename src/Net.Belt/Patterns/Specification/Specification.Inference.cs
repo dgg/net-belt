@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace Net.Belt.Patterns;
+namespace Net.Belt.Patterns.Specification;
 
 /// <summary>
 /// Represents the entry point for creating predicate-based specifications.
