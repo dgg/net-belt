@@ -116,4 +116,4 @@ jobs:
         id: push_to_nuget_feed
         env:
           NUGET_KEY_: ${{ secrets.NUGET_KEY }}
-        run: dotnet nuget push -s nuget.org *.nupkg --api-key ${{ secrets.NUGET_KEY }}
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_KEY }} --source nuget.org
