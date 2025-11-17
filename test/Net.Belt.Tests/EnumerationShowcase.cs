@@ -5,6 +5,8 @@ using Dumpify;
 
 using Net.Belt.Tests.Support;
 
+using NUnit.Framework.Internal;
+
 namespace Net.Belt.Tests;
 
 [TestFixture, Category("showcase")]

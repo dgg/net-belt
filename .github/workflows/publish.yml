@@ -1,0 +1,72 @@
+name: Publish
+
+run-name: ${{ github.actor }} publishing project ☁
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v5
+
+      - name: setup dotnet
+        id: setup_dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: ./global.json
+
+      - name: dotnet restore
+        id: dotnet_restore
+        run: dotnet restore
+
+      - name: dotnet build
+        id: dotnet_build
+        run: dotnet build --no-restore -c Release
+
+      - name: dotnet test
+        id: dotnet_test
+        run: dotnet run --no-build -c Release --project test/Net.Belt.Tests/ -- --settings test/.runsettings
+
+      - name: dotnet pack
+        id: dotnet_pack
+        run: dotnet pack --no-build -c Release src/Net.Belt/
+
+      - name: report test results
+        id: report_test_results
+        uses: dorny/test-reporter@v2
+        with:
+          name: Test Report
+          path: ./test/Net.Belt.Tests/bin/Release/*/TestResults/*.Tests.xml
+          reporter: dotnet-nunit
+          fail-on-error: true
+
+      - name: upload test results
+        id: upload_test_results
+        uses: actions/upload-artifact@v5
+        with:
+          name: test-results
+          path: ./test/Net.Belt.Tests/bin/Release/net9.0/TestResults/*.Tests.xml
+
+      - name: upload bin
+        id: upload_bin
+        uses: actions/upload-artifact@v5
+        with:
+          name: bin
+          path: |
+            ./src/Net.Belt/bin/Release/net9.0/*.dll
+            ./src/Net.Belt/bin/Release/net9.0/*.pbd
+            ./src/Net.Belt/bin/Release/net9.0/*.xml
+
+      - name: upload package
+        id: upload_package
+        uses: actions/upload-artifact@v5
+        with:
+          name: package
+          path: ./src/Net.Belt/bin/Release/*.nupkg
+
+      - run: echo "☑ status is ${{ job.status }}"
