@@ -1,6 +1,6 @@
-using Net.Belt.Patterns;
+using Net.Belt.Patterns.Specification;
 
-namespace Net.Belt.Tests.Patterns.Support;
+namespace Net.Belt.Tests.Patterns.Specification.Support;
 
 internal class MoreThan10 : Specification<int>
 {

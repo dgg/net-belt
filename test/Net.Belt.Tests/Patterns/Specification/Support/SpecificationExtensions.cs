@@ -1,6 +1,6 @@
 using NUnit.Framework.Constraints;
 
-namespace Net.Belt.Tests.Patterns.Support;
+namespace Net.Belt.Tests.Patterns.Specification.Support;
 
 internal class Iz: Is
 {

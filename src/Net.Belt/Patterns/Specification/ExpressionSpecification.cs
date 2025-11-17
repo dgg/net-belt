@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace Net.Belt.Patterns;
+namespace Net.Belt.Patterns.Specification;
 
 /// <summary>
 /// Represents a specification for instances of <typeparamref name="T"/> that is defined by a LINQ

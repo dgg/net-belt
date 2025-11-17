@@ -3,9 +3,9 @@ using System.Linq.Expressions;
 
 using Dumpify;
 
-using Net.Belt.Patterns;
+using Net.Belt.Patterns.Specification;
 
-namespace Net.Belt.Tests.Patterns;
+namespace Net.Belt.Tests.Patterns.Specification;
 
 [TestFixture, Category("showcase")]
 public class SpecificationShowcase

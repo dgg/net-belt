@@ -1,8 +1,8 @@
-using Net.Belt.Patterns;
+using Net.Belt.Patterns.Specification;
 
 using NUnit.Framework.Constraints;
 
-namespace Net.Belt.Tests.Patterns.Support;
+namespace Net.Belt.Tests.Patterns.Specification.Support;
 
 internal class SpecificationConstraint<T>(T value, bool satisfied) : Constraint
 {
