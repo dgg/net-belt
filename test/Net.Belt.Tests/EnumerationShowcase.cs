@@ -5,11 +5,16 @@ using Dumpify;
 
 using Net.Belt.Tests.Support;
 
+using NUnit.Framework.Internal;
+
 namespace Net.Belt.Tests;
 
 [TestFixture, Category("showcase")]
 public class EnumerationShowcase
 {
+	[Test]
+	public void Fail() => Assert.Fail("break CI");
+
 	[Test]
 	public void Definition()
 	{
