@@ -95,7 +95,7 @@ jobs:
 
       - name: push to gh feed
         id: push_to_gh_feed
-        run: dotnet nuget push .*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source github
+        run: dotnet nuget push *.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source github
 
   push_nuget_package:
     needs: build_and_publish
