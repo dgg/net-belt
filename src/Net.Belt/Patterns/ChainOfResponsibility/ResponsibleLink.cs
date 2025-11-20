@@ -3,44 +3,46 @@ namespace Net.Belt.Patterns.ChainOfResponsibility;
 /// <summary>
 /// 
 /// </summary>
-/// <param name="link"></param>
+/// <param name="canHandle"></param>
+/// <param name="doHandle"></param>
 /// <typeparam name="T"></typeparam>
-public class ResponsibleLink<T>(IChainOfResponsibilityLink<T> link) : ChainOfResponsibilityLink<T>
+public class ResponsibleLink<T>(Func<T, bool> canHandle, Func<T, T> doHandle) : ResponsibleLinkBase<T>
 {
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="context"></param>
 	/// <returns></returns>
-	public override bool CanHandle(T context) => link.CanHandle(context);
+	protected override bool CanHandle(T context) => canHandle(context);
 
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="context"></param>
-	protected override void DoHandle(T context) => link.DoHandle(context);
+	/// <returns></returns>
+	protected override T DoHandle(T context) => doHandle(context);
 }
 
 /// <summary>
 /// 
 /// </summary>
-/// <param name="link"></param>
+/// <param name="canHandle"></param>
+/// <param name="doHandle"></param>
 /// <typeparam name="T"></typeparam>
-/// <typeparam name="TResult"></typeparam>
-public class ResponsibleLink<T, TResult>(IChainOfResponsibilityLink<T, TResult> link)
-	: ChainOfResponsibilityLink<T, TResult>
+/// <typeparam name="U"></typeparam>
+public class ResponsibleLink<T, U>(Func<T, bool> canHandle, Func<T, U> doHandle) : ResponsibleLinkBase<T, U>
 {
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="context"></param>
 	/// <returns></returns>
-	public override bool CanHandle(T context) => link.CanHandle(context);
+	protected override bool CanHandle(T context) => canHandle(context);
 
 	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="context"></param>
 	/// <returns></returns>
-	protected override TResult DoHandle(T context) => link.DoHandle(context);
+	protected override U DoHandle(T context) => doHandle(context);
 }
