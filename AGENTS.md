@@ -42,6 +42,7 @@ This project (_Net.Belt_ - or _Net-Belt_-) contains the implentation of helpers,
 * create comprehensive XML documentation for all public types and members
 * include parameter descriptions and return value descriptions where applicable in XML comments
 * comments inside methods should be used sparingly, only when the code is not self-explanatory explaning the **why**, not the **what**
+* `true` and `false` in XML documentation are to be surrounded by `<c>`tags 
 
 ## Testing instructions
 
