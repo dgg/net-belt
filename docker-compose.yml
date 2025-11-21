@@ -25,7 +25,7 @@ services:
       - ./src:/opt/net-belt/src
       - ./test:/opt/net-belt/test
     working_dir: /opt/net-belt
-    command: dotnet run --project test/Net.Belt.Tests/ -c Release -- --settings test/.runsettings
+    command: dotnet run --project test/Net.Belt.Tests/ -c Release -- --settings test/.runsettings --config-file test/testconfig.json --coverage
     #depends_on:
     #  - build
 

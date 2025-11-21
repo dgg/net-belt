@@ -4,6 +4,7 @@ https://docs.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using
 
 <RunSettings>
 	<RunConfiguration />
+	<!-- coverage configuration in testconfig.json -->
 	<NUnit>
 		<NumberOfTestWorkers>-1</NumberOfTestWorkers>
 		<Verbosity>-1</Verbosity>
