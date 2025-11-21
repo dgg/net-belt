@@ -13,7 +13,7 @@ services:
     volumes:
       - ./src:/opt/net-belt/src
       - ./test:/opt/net-belt/test
-      - ./Net.Belt.sln:/opt/net-belt/Net.Belt.sln
+      - ./Net.Belt.slnx:/opt/net-belt/Net.Belt.slnx
     working_dir: /opt/net-belt
     command: dotnet build -c Release
     #depends_on:
