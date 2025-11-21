@@ -11,6 +11,8 @@ on:
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
+    env:
+      DOTNET_TFM: net10.0
     outputs:
       DOTNET_VERSION: ${{ steps.setup_dotnet.outputs.dotnet-version }}
     steps:
@@ -21,7 +23,7 @@ jobs:
         id: setup_dotnet
         uses: actions/setup-dotnet@v5
         with:
-          global-json-file: ./global.json
+          global-json-file: ${{ github.workspace }}/global.json
 
       - name: dotnet restore
         id: dotnet_restore
@@ -33,27 +35,68 @@ jobs:
 
       - name: dotnet test
         id: dotnet_test
-        run: dotnet run --no-build -c Release --project test/Net.Belt.Tests/ -- --settings test/.runsettings
+        run: |
+          dotnet run --no-build -c Release --project ${{ github.workspace }}/test/Net.Belt.Tests/ -- \
+            --coverage \
+            --settings test/.runsettings \
+            --config-file test/testconfig.json
 
       - name: dotnet pack
         id: dotnet_pack
-        run: dotnet pack --no-build -c Release src/Net.Belt/
+        run: dotnet pack --no-build -c Release ${{ github.workspace }}/src/Net.Belt/
 
       - name: report test results
         id: report_test_results
         uses: dorny/test-reporter@v2
+        if: always()
         with:
           name: Test Report
-          path: ./test/Net.Belt.Tests/bin/Release/*/TestResults/*.Tests.xml
+          path: ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/*/TestResults/*.Tests.xml
           reporter: dotnet-nunit
           fail-on-error: true
+
+      - name: report coverage
+        if: ${{ !env.ACT }}
+        uses: leoriviera/CodeCoverageSummary-arm64@v1.3.1
+        with:
+          filename: ./test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
+          badge: true
+          fail_below_limit: false
+          format: markdown
+          output: both
+          indicators: true
+          thresholds: "30 70"
+
+      - name: report local coverage
+        if: ${{ env.ACT }}
+        uses: leoriviera/CodeCoverageSummary-arm64@v1.3.1
+        with:
+          filename: ./test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
+          badge: true
+          fail_below_limit: false
+          format: markdown
+          output: both
+          indicators: true
+          thresholds: "30 70"
+
+      - name: upload coverage
+        uses: codecov/codecov-action@v5.5.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          dry-run: ${{ env.ACT }}
+          fail_ci_if_error: false
+          files: ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
+          slug: dgg/net-belt
+
+      - name: copy coverage report to ResultDirectory
+        run: cp ${{ github.workspace }}/code-coverage-results.md ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.coverage.md
 
       - name: upload test results
         id: upload_test_results
         uses: actions/upload-artifact@v5
         with:
           name: test-results
-          path: ./test/Net.Belt.Tests/bin/Release/net9.0/TestResults/*.Tests.xml
+          path: ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/
 
       - name: upload bin
         id: upload_bin
@@ -61,23 +104,23 @@ jobs:
         with:
           name: bin
           path: |
-            ./src/Net.Belt/bin/Release/net9.0/*.dll
-            ./src/Net.Belt/bin/Release/net9.0/*.pbd
-            ./src/Net.Belt/bin/Release/net9.0/*.xml
+            ${{ github.workspace }}/src/Net.Belt/bin/Release/${{ env.DOTNET_TFM }}/*.dll
+            ${{ github.workspace }}/src/Net.Belt/bin/Release/${{ env.DOTNET_TFM }}/*.pbd
+            ${{ github.workspace }}/src/Net.Belt/bin/Release/${{ env.DOTNET_TFM }}/*.xml
 
       - name: upload package
         id: upload_package
         uses: actions/upload-artifact@v5
         with:
           name: package
-          path: ./src/Net.Belt/bin/Release/*.nupkg
+          path: ${{ github.workspace }}/src/Net.Belt/bin/Release/*.nupkg
 
       - run: echo "☑ status is ${{ job.status }}"
 
   push_nuget_package:
     needs: build_and_publish
     runs-on: ubuntu-latest
-    environment: 'Nuget Feed'
+    environment: "Nuget Feed"
     steps:
       - name: download package
         uses: actions/download-artifact@v6

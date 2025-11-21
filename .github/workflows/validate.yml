@@ -19,7 +19,7 @@ jobs:
         id: setup_dotnet
         uses: actions/setup-dotnet@v5
         with:
-          global-json-file: ./global.json
+          global-json-file: ${{ github.workspace }}/global.json
 
       - name: dotnet restore
         id: dotnet_restore
@@ -31,14 +31,15 @@ jobs:
 
       - name: dotnet test
         id: dotnet_test
-        run: dotnet run --no-build -c Release --project test/Net.Belt.Tests/ -- --settings test/.runsettings
-
+        run: |
+          dotnet run --no-build -c Release --project ${{ github.workspace }}/test/Net.Belt.Tests/ -- \
+          --settings test/.runsettings
       - name: report tests
         id: report_tests
         uses: dorny/test-reporter@v2
         with:
           name: Test Report
-          path: ./test/Net.Belt.Tests/bin/Release/*/TestResults/*.Tests.xml
+          path: ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/*/TestResults/*.Tests.xml
           reporter: dotnet-nunit
           fail-on-error: true
 

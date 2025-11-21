@@ -1,10 +1,6 @@
 {
 	"Configuration": {
 		"CoverageFileName": "Net.Belt.cobertura.xml",
-		"Format": "coverage",
-		"NUnit" : {
-			"DumpXmlTestResults": true,
-			"TestOutputXml": "TestOutputXml"
-		}
+		"Format": "cobertura"
 	}
 }
