@@ -5,8 +5,6 @@ using Dumpify;
 
 using Net.Belt.Tests.Support;
 
-using NUnit.Framework.Internal;
-
 namespace Net.Belt.Tests;
 
 [TestFixture, Category("showcase")]
@@ -39,7 +37,7 @@ public class EnumerationShowcase
 	
 		Enumeration.Omit(PlatformID.Xbox).Dump("Consoles are NOT computers!");
 	
-		byte small = Enumeration.GetValue<PlatformID, byte>(PlatformID.MacOSX).Dump("Numeric type conversions apply");
+		byte _ = Enumeration.GetValue<PlatformID, byte>(PlatformID.MacOSX).Dump("Numeric type conversions apply");
 		//Enumeration.GetValue<PlatformID, byte>((PlatformID)256).Dump("Exception for undefined values");
 	
 		Enumeration.TryGetValue((PlatformID)256, out byte? maybe).Dump("Nope");

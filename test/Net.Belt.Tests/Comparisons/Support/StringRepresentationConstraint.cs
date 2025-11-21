@@ -5,7 +5,7 @@ using NUnit.Framework.Internal;
 
 namespace Net.Belt.Tests.Comparisons.Support;
 
-internal partial class StringRepresentationConstraint(string representation) : Constraint
+internal class StringRepresentationConstraint(string representation) : Constraint
 {
 	private readonly EqualConstraint _inner = new(representation);
 	
