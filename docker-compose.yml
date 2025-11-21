@@ -1,7 +1,7 @@
 services:
 
   clean:
-    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-10.0.100-noble}
     volumes:
       - ./src:/opt/net-belt/src
       - ./test:/opt/net-belt/test
@@ -9,7 +9,7 @@ services:
     command: sh -c 'find . -iname bin -o -iname obj | xargs rm -rf'
 
   build:
-    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-10.0.100-noble}
     volumes:
       - ./src:/opt/net-belt/src
       - ./test:/opt/net-belt/test
@@ -20,7 +20,7 @@ services:
     #  - clean
 
   test:
-    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-10.0.100-noble}
     volumes:
       - ./src:/opt/net-belt/src
       - ./test:/opt/net-belt/test
@@ -30,7 +30,7 @@ services:
     #  - build
 
   pack:
-    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-10.0.100-noble}
     volumes:
       - ./src:/opt/net-belt/src
       - ./LICENSE:/opt/net-belt/LICENSE
@@ -41,7 +41,7 @@ services:
     #  - test
 
   publish:
-    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-9.0.306-noble}
+    image: mcr.microsoft.com/dotnet/sdk:${SDK_VERSION:-10.0.100-noble}
     volumes:
       - ./src:/opt/net-belt/src
       - ${NUGET_CONFIG_PATH:-~/.nuget}:/root/.nuget

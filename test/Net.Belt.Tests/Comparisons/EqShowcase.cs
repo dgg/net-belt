@@ -9,7 +9,7 @@ public class EqShowcase
 {
 	internal class Subject
 	{
-		public string S { get; set; }
+		public required string S { get; set; }
 		public int I { get; set; }
 		public decimal D { get; set; }
 

@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Net.Belt.Tests.ValueObjects.Support;
@@ -240,21 +239,21 @@ public class ValueRangeTester
 	[Test]
 	public void AssertArgument_NullCollection_Exception()
 	{
-		Assert.That(() => ValueRange.Closed(1, 5).AssertArgument("arg", null),
+		Assert.That(() => ValueRange.Closed(1, 5).AssertArgument("arg", null!),
 			Throws.InstanceOf<ArgumentNullException>());
 	}
 
 	[Test]
 	public void AssertArgument_AllContained_NoException()
 	{
-		Assert.That(() => ValueRange.Closed(1, 5).AssertArgument("arg", new[] { 2, 3, 4 }),
+		Assert.That(() => ValueRange.Closed(1, 5).AssertArgument("arg", [2, 3, 4]),
 			Throws.Nothing);
 	}
 
 	[Test]
 	public void AssertArgument_SomeNotContained_ExceptionWithOffendingMember()
 	{
-		Assert.That(() => ValueRange.Closed(1, 5).AssertArgument("arg", new[] { 2, 6, 4 }),
+		Assert.That(() => ValueRange.Closed(1, 5).AssertArgument("arg", [2, 6, 4]),
 			Throws.InstanceOf<ArgumentOutOfRangeException>()
 				.With.Message.Contain("[1..5]").And
 				.With.Message.Contain("1 (inclusive)").And

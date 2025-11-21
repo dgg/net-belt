@@ -5,11 +5,11 @@ using NUnit.Framework.Internal;
 
 namespace Net.Belt.Tests.Comparisons.Support;
 
-internal class StringRepresentationConstraint(string representation) : Constraint
+internal partial class StringRepresentationConstraint(string representation) : Constraint
 {
 	private readonly EqualConstraint _inner = new(representation);
 	
-	private string represent(IEnumerable collection) => string.Join(", ", collection.Cast<object>().Select(o => o.ToString()));
+	private static string represent(IEnumerable collection) => string.Join(", ", collection.Cast<object>().Select(o => o.ToString()));
 
 	public override ConstraintResult ApplyTo<TActual>(TActual actual)
 	{
