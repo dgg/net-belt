@@ -61,7 +61,7 @@ jobs:
         with:
           filename: ./test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
           badge: true
-          fail_below_limit: false
+          fail_below_min: false
           format: markdown
           output: both
           indicators: true
@@ -73,7 +73,7 @@ jobs:
         with:
           filename: ./test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
           badge: true
-          fail_below_limit: false
+          fail_below_min: false
           format: markdown
           output: both
           indicators: true
@@ -83,7 +83,7 @@ jobs:
         uses: codecov/codecov-action@v5.5.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          dry-run: ${{ env.ACT }}
+          dry_run: ${{ env.ACT }}
           fail_ci_if_error: false
           files: ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
           slug: dgg/net-belt
