@@ -45,52 +45,6 @@ jobs:
         id: dotnet_pack
         run: dotnet pack --no-build -c Release ${{ github.workspace }}/src/Net.Belt/
 
-      - name: report test results
-        id: report_test_results
-        uses: dorny/test-reporter@v2
-        if: always()
-        with:
-          name: Test Report
-          path: ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/*/TestResults/*.Tests.xml
-          reporter: dotnet-nunit
-          fail-on-error: true
-
-      - name: report coverage
-        if: ${{ !env.ACT }}
-        uses: leoriviera/CodeCoverageSummary-arm64@v1.3.1
-        with:
-          filename: ./test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
-          badge: true
-          fail_below_min: false
-          format: markdown
-          output: both
-          indicators: true
-          thresholds: "30 70"
-
-      - name: report local coverage
-        if: ${{ env.ACT }}
-        uses: leoriviera/CodeCoverageSummary-arm64@v1.3.1
-        with:
-          filename: ./test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
-          badge: true
-          fail_below_min: false
-          format: markdown
-          output: both
-          indicators: true
-          thresholds: "30 70"
-
-      - name: upload coverage
-        uses: codecov/codecov-action@v5.5.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          dry_run: ${{ env.ACT }}
-          fail_ci_if_error: false
-          files: ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.cobertura.xml
-          slug: dgg/net-belt
-
-      - name: copy coverage report to ResultDirectory
-        run: cp ${{ github.workspace }}/code-coverage-results.md ${{ github.workspace }}/test/Net.Belt.Tests/bin/Release/${{ env.DOTNET_TFM }}/TestResults/Net.Belt.coverage.md
-
       - name: upload test results
         id: upload_test_results
         uses: actions/upload-artifact@v5
@@ -123,9 +77,16 @@ jobs:
     environment: "Nuget Feed"
     steps:
       - name: download package
+        id: download_package
         uses: actions/download-artifact@v6
         with:
           name: package
+
+      - name: download test results
+        id: download_test_results
+        uses: actions/download-artifact@v6
+        with:
+          name: test-results
 
       - name: setup dotnet for pushing
         uses: actions/setup-dotnet@v5
@@ -135,3 +96,12 @@ jobs:
       - name: push to nuget feed
         id: push_to_nuget_feed
         run: dotnet nuget push *.nupkg --api-key ${{ secrets.NUGET_KEY }} --source nuget.org
+
+      - name: upload coverage
+        uses: codecov/codecov-action@v5.5.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          dry_run: ${{ env.ACT }}
+          fail_ci_if_error: false
+          files: ${{ github.workspace }}/Net.Belt.cobertura.xml
+          slug: dgg/net-belt
