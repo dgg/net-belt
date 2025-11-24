@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOTNET_TFM: net10.0
+    permissions:
+      pull-requests: write
     steps:
       - name: Check out repository code
         id: checkout
