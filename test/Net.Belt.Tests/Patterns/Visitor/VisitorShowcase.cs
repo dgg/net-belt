@@ -65,7 +65,6 @@ public class VisitorShowcase
 		president.Dump("after visitor configuration");
 	}
 
-	// try default implementation of IVisitable
 	abstract class Staff : IVisitable<Staff>
 	{
 		public byte DaysOfVacation { get; set; }
@@ -106,12 +105,28 @@ public class VisitorShowcase
 			executive = new Executive();
 		
 		teller.Accept(visitor);
-		teller.Dump("after visitor configuration");
-		
+		teller
+			.Dump("after visitor configuration");
 		manager.Accept(visitor);
-		manager.Dump("after visitor configuration");
-		
+		manager
+			.Dump("after visitor configuration");
 		executive.Accept(visitor);
-		executive.Dump("after visitor configuration");
+		executive
+			.Dump("after visitor configuration");
+		
+		var another = new DelegatedVisitor<Staff>()
+			.AddVisitor<Executive>(p => p.DaysOfVacation += 20)
+			.AddVisitor<Manager>(p => p.DaysOfVacation = 1)
+			.AddVisitor<Teller>(p => p.DaysOfVacation = 0);
+		
+		executive.Accept(another);
+		executive
+			.Dump("after another configuration");
+		manager.Accept(another);
+		manager
+			.Dump("after another configuration");
+		teller.Accept(another);
+		teller
+			.Dump("after another configuration");
 	}
 }
