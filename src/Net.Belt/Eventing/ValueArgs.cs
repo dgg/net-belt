@@ -1,13 +1,13 @@
 namespace Net.Belt.Eventing;
 
 /// <summary>
-/// 
+/// Represents event arguments that carry one value.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">The type of the value.</typeparam>
 public interface IValueArgs<out T>
 {
 	/// <summary>
-	/// 
+	/// Gets the value.
 	/// </summary>
 	T Value { get; }
 }
