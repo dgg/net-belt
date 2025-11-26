@@ -43,6 +43,8 @@ This project (_Net.Belt_ - or _Net-Belt_-) contains the implentation of helpers,
 * include parameter descriptions and return value descriptions where applicable in XML comments
 * comments inside methods should be used sparingly, only when the code is not self-explanatory explaning the **why**, not the **what**
 * `true` and `false` in XML documentation are to be surrounded by `<c>`tags 
+* do not document members that already have a <inheritdoc /> tag in their doc
+* interfaces do not need to specify that they interfaces in the documentation, just document the purpose so that the doc can be inherited in implementations
 
 ## Testing instructions
 
