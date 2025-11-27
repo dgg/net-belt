@@ -52,7 +52,7 @@ public static class Args
 	/// <typeparam name="T">The type of the value.</typeparam>
 	/// <returns>A new <see cref="ValueIndexChangedArgs{T}"/> instance.</returns>
 	public static ValueIndexChangedArgs<T> Changed<T>(int index, T oldValue, T newValue) =>
-		new(index, oldValue, newValue);
+		new(index, newValue, oldValue);
 
 	/// <summary>
 	/// Creates a new instance of <see cref="PropertyValueChangingEventArgs{T}"/> for a property that is changing.
