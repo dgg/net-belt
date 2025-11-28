@@ -47,7 +47,7 @@ public class ArgsTester
 	[Test]
 	public void Ctor_IndexChangedArgs_EqualToFactoryCreated()
 	{
-		var args = new ValueIndexChangedArgs<string>(0, "old", "new");
+		var args = new ValueIndexChangedArgs<string>(0, "new", "old");
 		Assert.That(args, Is.EqualTo(Args.Changed(0, "old", "new")));
 	}
 
