@@ -8,7 +8,7 @@ using Net.Belt.Eventing;
 
 namespace Net.Belt.Tests.Eventing;
 
-[TestFixture, NUnit.Framework.Category("showcase")]
+[TestFixture, NUnit.Framework.Category("showcase"), Explicit("noisy")]
 public class EventingShowcase
 {
 	class DataEventArgs : EventArgs

@@ -4,7 +4,7 @@ using Net.Belt.Comparisons;
 
 namespace Net.Belt.Tests.Comparisons;
 
-[TestFixture, Category("showcase")]
+[TestFixture, Category("showcase"), Explicit("noisy")]
 public class CmpShowcase
 {
 	internal record Subject(string S, int I, decimal D)
