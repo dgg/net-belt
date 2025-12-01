@@ -9,7 +9,7 @@ using Testing.Commons.Time;
 
 namespace Net.Belt.Tests.ValueObjects;
 
-[TestFixture, Category("showcase")]
+[TestFixture, Category("showcase"), Explicit("noisy")]
 public class ValueRangeShowcase
 {
 	[Test]

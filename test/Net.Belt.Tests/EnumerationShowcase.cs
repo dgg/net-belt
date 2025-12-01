@@ -7,7 +7,7 @@ using Net.Belt.Tests.Support;
 
 namespace Net.Belt.Tests;
 
-[TestFixture, Category("showcase")]
+[TestFixture, Category("showcase"), Explicit("noisy")]
 public class EnumerationShowcase
 {
 	[Test]

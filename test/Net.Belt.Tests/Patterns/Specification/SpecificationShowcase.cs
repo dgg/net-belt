@@ -7,7 +7,7 @@ using Net.Belt.Patterns.Specification;
 
 namespace Net.Belt.Tests.Patterns.Specification;
 
-[TestFixture, Category("showcase")]
+[TestFixture, Category("showcase"), Explicit("noisy")]
 public class SpecificationShowcase
 {
 	class OddSpec : Specification<int>

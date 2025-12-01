@@ -4,7 +4,7 @@ using Net.Belt.Patterns.ChainOfResponsibility;
 
 namespace Net.Belt.Tests.Patterns.ChainOfResponsibility;
 
-[TestFixture, Category("showcase")]
+[TestFixture, Category("showcase"), Explicit("noisy")]
 public class ChainOfResponsibilityShowcase
 {
 	// re-implementing "the chain" again

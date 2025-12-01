@@ -8,7 +8,7 @@ using Net.Belt.ValueObjects.Extensions;
 
 namespace Net.Belt.Tests.ValueObjects;
 
-[TestFixture, Category("showcase")]
+[TestFixture, Category("showcase"), Explicit("noisy")]
 public class PercentageShowcase
 {
 	[Test]

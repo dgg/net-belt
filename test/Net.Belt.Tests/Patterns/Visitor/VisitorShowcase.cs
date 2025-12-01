@@ -4,7 +4,7 @@ using Net.Belt.Patterns.Visitor;
 
 namespace Net.Belt.Tests.Patterns.Visitor;
 
-[TestFixture, Category("showcase")]
+[TestFixture, Category("showcase"), Explicit("noisy")]
 public class VisitorShowcase
 {
 	abstract class Employee
