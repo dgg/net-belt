@@ -203,6 +203,10 @@ public class AgeTester
 		Assert.That(left.CompareTo(right), comparisonConstraint);
 
 	[Test]
+	public void CompareTo_BoxedNull_GreaterThanZero() =>
+		Assert.That(() => Age.Empty.CompareTo(null), Is.GreaterThan(0));
+	
+	[Test]
 	public void CompareTo_BoxedUnsupported_Exception() =>
 		Assert.That(() => Age.Empty.CompareTo(1), Throws.ArgumentException
 			.With.Message.Contains(nameof(Age))
