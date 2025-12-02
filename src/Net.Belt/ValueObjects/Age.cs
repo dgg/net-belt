@@ -121,16 +121,13 @@ public readonly struct Age : IEquatable<Age>, IComparable<Age>, IComparisonOpera
 	public static bool operator !=(Age left, Age right) => !left.Equals(right);
 
 	/// <inheritdoc />
-	public int CompareTo(object? obj)
+	public int CompareTo(object? obj) => obj switch
 	{
-		return obj switch
-		{
-			Age other => CompareTo(other),
-			TimeSpan span => CompareTo(span),
-			_ => throw new ArgumentException($"Object must be of type '{nameof(Age)}' or '{nameof(TimeSpan)}'.",
-				nameof(obj))
-		};
-	}
+		null => 1,
+		Age other => CompareTo(other),
+		TimeSpan span => CompareTo(span),
+		_ => throw new ArgumentException($"Object must be of type '{nameof(Age)}' or '{nameof(TimeSpan)}'.", nameof(obj))
+	};
 
 	/// <inheritdoc />
 	public int CompareTo(Age other) => Span.CompareTo(other.Span);
@@ -158,7 +155,7 @@ public readonly struct Age : IEquatable<Age>, IComparable<Age>, IComparisonOpera
 	/// <inheritdoc />
 	/// <remarks>Mimics records' <see cref="object.ToString"/> behavior.</remarks>
 	public override string ToString() => _toString.Value;
-	
+
 	/// <summary>
 	/// Creates a new <see cref="Age"/> instance from a starting date to the current UTC date provided by a <see cref="TimeProvider"/>.
 	/// </summary>
