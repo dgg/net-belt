@@ -23,8 +23,9 @@ This project (_Net.Belt_ - or _Net-Belt_-) contains the implentation of helpers,
   * do not make large speculative changes
 
 ## Code style guidelines
-* use the C# coding guidelines described by .editorconfig
-	* **Naming Conventions:**
+* follow the styling guides defined in the .editorconfig file at the repository root
+* follow the C# coding guidelines defined in the .editorconfig file at the repository root
+	* **Important Naming Conventions:**
 		* private fields: `_camelCase` (e.g., `_myField`)
 		* private static fields: `_camelCase` (e.g., `_myStaticField`)
 		* local functions: `_camelCase` (e.g., `_myLocalFunction`)
@@ -57,6 +58,7 @@ This project (_Net.Belt_ - or _Net-Belt_-) contains the implentation of helpers,
 * test both positive and negative scenarios
 * tests should be able to run in any order or in parallel without affecting each other
 * support types in tests are to be placed in a separate sub-folder named "Support" within the test project with _internal_ accessibility
+* minimize the logic in tests, specially avoid branching logic
 
 ### Frameworks
 * tests are written using latest version of NUnit
