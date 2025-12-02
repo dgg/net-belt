@@ -9,7 +9,7 @@ namespace Net.Belt.ValueObjects;
 /// </summary>
 public readonly struct HexFigure : IEquatable<HexFigure>,
 	IComparable, IComparable<HexFigure>, IComparisonOperators<HexFigure, HexFigure, bool>,
-	IParsable<HexFigure>, ISpanParsable<HexFigure>
+	ISpanParsable<HexFigure>
 {
 	/// <summary>
 	/// Gets the numeric value of the hexadecimal digit (0-15).
@@ -146,30 +146,34 @@ public readonly struct HexFigure : IEquatable<HexFigure>,
 	/// <inheritdoc/>
 	public static HexFigure Parse(ReadOnlySpan<char> s, IFormatProvider? provider)
 	{
-		if (s.Length != 1)
+		if (!TryParse(s, provider, out HexFigure parsed))
 		{
-			throw new FormatException("Input must be a single hexadecimal character.");
+			throw new FormatException("Input is not a valid hexadecimal figure.");			
 		}
 
-		if (!checkInRange(s[0]))
-		{
-			throw new FormatException("Input character is not a valid hexadecimal character.");
-		}
-
-		return new HexFigure(s[0]);
+		return parsed;
 	}
 
 	/// <inheritdoc/>
-	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, [MaybeNullWhen(false)] out HexFigure result)
+	public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out HexFigure result)
 	{
 		result = default;
-		if (s.Length != 1) return false;
 
-		char c = s[0];
-		if (!checkInRange(c)) return false;
+		// try to parse it as numeric span
+		if (byte.TryParse(s, NumberStyles.Integer, provider, out byte numeric) && checkInRange(numeric))
+		{
+			result = new HexFigure(numeric);
+			return true;
+		}
 
-		result = new HexFigure(c);
-		return true;
+		// try to parse it as a char
+		if (s.Length == 1 && byte.TryParse(s, NumberStyles.HexNumber, provider, out numeric) && checkInRange(numeric))
+		{
+			result = new HexFigure(numeric);
+			return true;
+		}
+
+		return false;
 	}
 	private static bool checkInRange(byte numeric) => numeric <= 15;
 	private static bool checkInRange(char character) => char.IsAsciiHexDigit(character);

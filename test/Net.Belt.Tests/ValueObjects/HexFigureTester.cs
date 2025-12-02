@@ -270,17 +270,23 @@ public class HexFigureTester
 	[
 		testCase("0", 0),
 		testCase("9", 9),
+		testCase("09", 9),
+		testCase("10", 10),
+		testCase("011", 11),
 		testCase("A", 10),
 		testCase("F", 15),
 		testCase("a", 10),
 		testCase("f", 15),
+		
 	];
 
 	private static readonly TestCaseData[] _invalidInputs =
 	[
 		new TestCaseData("G").SetDescription("not hex"),
-		new TestCaseData("01").SetDescription("not single character"),
-		new TestCaseData("").SetDescription("empty")
+		new TestCaseData("hola").SetDescription("very not hex"),
+		new TestCaseData("").SetDescription("empty"),
+		new TestCaseData("16").SetDescription("numeric value out of range"),
+		new TestCaseData("FF").SetDescription("multi-character hex string out of range")
 	];
 	private static TestCaseData<string, byte> testCase(string input, byte expectedNumeric) =>
 		new(input, expectedNumeric);
