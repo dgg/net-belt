@@ -9,7 +9,7 @@ namespace Net.Belt.ValueObjects;
 /// </summary>
 public readonly struct HexFigure : IEquatable<HexFigure>,
 	IComparable, IComparable<HexFigure>, IComparisonOperators<HexFigure, HexFigure, bool>,
-	ISpanParsable<HexFigure>
+	ISpanParsable<HexFigure>, IFormattable
 {
 	/// <summary>
 	/// Gets the numeric value of the hexadecimal digit (0-15).
@@ -84,7 +84,41 @@ public readonly struct HexFigure : IEquatable<HexFigure>,
 
 	/// <inheritdoc/>
 	/// <returns>A single hexadecimal character in uppercase.</returns>
-	public override string ToString() => Character.ToString(CultureInfo.InvariantCulture);
+	public override string ToString() => ToString(null, null);
+
+	/// <inheritdoc/>
+	/// <remarks>The following format strings are supported:
+	/// <list type="table">
+	///	<listheader>
+	/// <term>Format string</term>
+	/// <description>Description</description>
+	/// </listheader>
+	/// <item>
+	///	<term><c>X</c>(default) </term>
+	/// <description>Hexadecimal digit.</description>
+	/// </item>
+	/// <item>
+	///	<term><c>N</c></term>
+	/// <description>Numeric string.</description>
+	/// </item>
+	/// </list>
+	/// </remarks>
+	public string ToString(string? format, IFormatProvider? formatProvider)
+	{
+		if (string.IsNullOrEmpty(format))
+		{
+			format = "X"; // Default to character representation
+		}
+
+		formatProvider ??= CultureInfo.InvariantCulture;
+
+		return format.ToUpperInvariant() switch
+		{
+			"N" => Numeric.ToString(formatProvider),
+			"X" => Character.ToString(formatProvider),
+			_ => throw new FormatException($"The '{format}' format string is not supported."),
+		};
+	}
 
 	/// <inheritdoc/>
 	public bool Equals(HexFigure other) => Numeric == other.Numeric;

@@ -103,6 +103,25 @@ public class HexFigureTester
 		Assert.That(new HexFigure(11).ToString(), Is.EqualTo("B"));
 	}
 
+	[TestCase(0, null, "0")]
+	[TestCase(10, "", "A")]
+	[TestCase(15, "X", "F")]
+	public void ToString_WithCharacterFormat_HexDigit(byte numeric, string? format, string expected) =>
+		Assert.That(new HexFigure(numeric).ToString(format, null), Is.EqualTo(expected));
+
+	[TestCase(0, "N", "0")]
+	[TestCase(9, "N", "9")]
+	[TestCase(10, "N", "10")]
+	[TestCase(15, "N", "15")]
+	public void ToString_WithNumericFormat_NumericString(byte numeric, string format, string expected) =>
+		Assert.That(new HexFigure(numeric).ToString(format, null), Is.EqualTo(expected));
+
+	[Test]
+	public void ToString_InvalidFormat_Exception() =>
+		Assert.That(() => HexFigure.Zero.ToString("C", null), Throws.InstanceOf<FormatException>()
+			.With.Message.Contains("'C'").And
+			.Message.Contains("not supported"));
+
 	#endregion
 
 	#region tuple-like features
@@ -285,8 +304,8 @@ public class HexFigureTester
 		new TestCaseData("G").SetDescription("not hex"),
 		new TestCaseData("hola").SetDescription("very not hex"),
 		new TestCaseData("").SetDescription("empty"),
-		new TestCaseData("16").SetDescription("numeric value out of range"),
-		new TestCaseData("FF").SetDescription("multi-character hex string out of range")
+		new TestCaseData("16").SetDescription("out-of-range numeric"),
+		new TestCaseData("FF").SetDescription("multi-character hex string")
 	];
 	private static TestCaseData<string, byte> testCase(string input, byte expectedNumeric) =>
 		new(input, expectedNumeric);
