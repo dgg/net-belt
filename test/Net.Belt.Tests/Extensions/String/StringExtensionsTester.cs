@@ -6,6 +6,8 @@ using NUnit.Framework.Internal;
 
 using Testing.Commons;
 
+using Iz = Net.Belt.Tests.Extensions.String.Support.Iz;
+
 namespace Net.Belt.Tests.Extensions.String;
 
 [TestFixture]
@@ -201,5 +203,35 @@ public class StringExtensionsTester
 	public void Insert_EveryZeroChars_Exception() =>
 		Assert.That(() => "abc".Insert("-").Every(0), Throws.InstanceOf<ArgumentOutOfRangeException>());
 
+	#endregion
+	
+	#region compression
+	
+	[Test]
+	public void Compress_LongString_SmallerFootprint()
+	{
+		string longString = new ('a', 120);
+
+		Assert.That(longString, Has.Length.EqualTo(120));
+
+		Assert.That(longString.GZip.Compress(), Has.Length.LessThan(120));
+	}
+	
+	[Test]
+	public void Compress_Base64()
+	{
+		string longString = new ('a', 120);
+		Assert.That(longString.GZip.Compress(), Iz.Base64());
+	}
+
+	[Test]
+	public void Decompress_GetsOriginalString()
+	{
+		string original = new string('a', 120),
+			compressed = original.GZip.Compress();
+			
+		Assert.That(compressed.GZip.Decompress(), Is.EqualTo(original));
+	}
+	
 	#endregion
 }
