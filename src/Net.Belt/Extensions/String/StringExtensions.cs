@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Net.Belt.Extensions.String;
 
 /// <summary>
@@ -39,6 +41,36 @@ public static class StringExtensions
 		/// Groups substring extensions on the current string.
 		/// </summary>
 		public SubstrExtension Substr => new(s);
+
+		/// <summary>
+		/// Splits the string into chunks of the specified size.
+		/// </summary>
+		/// <param name="chunkSize">The maximum size of each chunk.</param>
+		/// <returns>An enumerable of string chunks.</returns>
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// Thrown when <paramref name="chunkSize"/> is <c>0</c>.
+		/// </exception>
+		public IEnumerable<string> Chunkify(ushort chunkSize)
+		{
+			if (chunkSize == 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(chunkSize), chunkSize, "Chunk size cannot be zero.");
+			}
+
+			int offset = 0;
+			while (offset < s.Length)
+			{
+				int size = Math.Min(chunkSize, s.Length - offset);
+				yield return s.Substring(offset, size);
+				offset += size;
+			}
+		}
+		
+		/// <summary>
+		/// Provides extension methods for insertion operations.
+		/// </summary>
+		/// <param name="separator">The separator string to be inserted.</param>
+		public InsertExtensions Insert(string separator) => new(s, separator);
 	}
 }
 
