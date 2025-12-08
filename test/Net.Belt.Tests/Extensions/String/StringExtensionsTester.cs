@@ -2,6 +2,10 @@ using Net.Belt.Extensions.String;
 using Net.Belt.Tests.Extensions.String.Support;
 using Net.Belt.ValueObjects;
 
+using NUnit.Framework.Internal;
+
+using Testing.Commons;
+
 namespace Net.Belt.Tests.Extensions.String;
 
 [TestFixture]
@@ -146,4 +150,56 @@ public class StringExtensionsTester
 	
 	#endregion
 	
+	#region Chunkify
+	
+	[Test]
+	public void Chunkify_LengthLessThanChunk_OneChunk() =>
+		Assert.That("123".Chunkify(5), Is.EqualTo(["123"]));
+	
+	[Test]
+	public void Chunkify_LengthMultipleOfChunkSize_MultipleChunksOfEqualSize() =>
+		Assert.That("123456789".Chunkify(3), Is.EqualTo(["123", "456", "789"]));
+	
+	[Test]
+	public void Chunkify_LengthMultipleOfChunkSize_LastChunkIsSmaller() =>
+		Assert.That("123456789".Chunkify(5), Is.EqualTo(["12345", "6789"]));
+	
+	[Test]
+	public void Chunkify_Zero_ThrowsArgumentOutOfRangeException() =>
+		Assert.That(() => "123456789".Chunkify(0).Iterate(), Throws.InstanceOf<ArgumentOutOfRangeException>());
+
+	#endregion
+	
+	#region Insert
+
+	[Test]
+	public void Insert_EveryChar_SeparatorEveryOtherChar() =>
+		Assert.That("input".Insert("-").Every(1), Is.EqualTo("i-n-p-u-t"));
+	
+	[Test]
+	[TestCase("", "-", 1, "", Description = "empty string")]
+	[TestCase("a", "-", 1, "a", Description = "single char")]
+	[TestCase("ab", "-", 1, "a-b", Description = "two chars every 1")]
+	[TestCase("abc", "-", 1, "a-b-c", Description = "three chars every 1")]
+	[TestCase("abcd", "-", 2, "ab-cd", Description = "four chars every 2")]
+	[TestCase("abcdefgh", "-", 3, "abc-def-gh", Description = "eight chars every 3")]
+	[TestCase("12345", ":", 1, "1:2:3:4:5", Description = "numeric string with colon separator")]
+	[TestCase("abc", "--", 1, "a--b--c", Description = "multi-char separator every 1")]
+	[TestCase("abcd", ":::", 2, "ab:::cd", Description = "multi-char separator every 2")]
+	public void Every_VariousLengthsAndIntervals(string input, string separator, int interval, string expected) =>
+		Assert.That(input.Insert(separator).Every((ushort)interval), Is.EqualTo(expected));
+	
+	[Test]
+	public void Insert_EmptySeparator_SameString() =>
+		Assert.That("abc".Insert(string.Empty).Every(1), Is.EqualTo("abc"));
+	
+	[Test]
+	public void Insert_BigInterval_SameString() =>
+		Assert.That("abc".Insert(string.Empty).Every(10), Is.EqualTo("abc"));
+
+	[Test]
+	public void Insert_EveryZeroChars_Exception() =>
+		Assert.That(() => "abc".Insert("-").Every(0), Throws.InstanceOf<ArgumentOutOfRangeException>());
+
+	#endregion
 }
