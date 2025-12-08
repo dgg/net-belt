@@ -71,6 +71,11 @@ public static class StringExtensions
 		/// </summary>
 		/// <param name="separator">The separator string to be inserted.</param>
 		public InsertExtensions Insert(string separator) => new(s, separator);
+		
+		/// <summary>
+		/// Provides extension methods for compression operations.
+		/// </summary>
+		public ZipExtensions GZip => new(s);
 	}
 }
 
