@@ -6,15 +6,9 @@ namespace Net.Belt.Extensions.String;
 /// <summary>
 /// Provides extension methods for compressing and decompressing strings using GZip.
 /// </summary>
-public readonly struct ZipExtensions
+/// <param name="s">The string to be compressed or decompressed.</param>
+public readonly struct ZipExtensions(string s)
 {
-	/// <summary>
-	/// Initializes a new instance of the <see cref="ZipExtensions"/> struct with the specified string.
-	/// </summary>
-	/// <param name="s">The string to be compressed or decompressed.</param>
-	public ZipExtensions(string s) => this.s = s;
-
-	private readonly string s;
 	/// <summary>
 	/// Compresses the string provided to this <see cref="ZipExtensions"/> instance using GZip and encodes the result as a Base64 string.
 	/// </summary>
