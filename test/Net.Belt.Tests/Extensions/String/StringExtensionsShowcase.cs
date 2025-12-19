@@ -121,4 +121,20 @@ public class StringExtensionsShowcase
 		compressed.GZip.Decompress().Length
 			.Dump(compressed.Length.ToString());
 	}
+	
+	[Test]
+	public void Concatenate()
+	{
+		"DOMAIN".IfNotThere.Append("\\")
+			.Dump("postfixed");
+		
+		"USER_NAME".IfNotThere.Prepend("\\")
+			.Dump("prefixed");
+
+		"https://hostname.com/".IfNotThere.Append("/")
+			.Dump("no need to append");
+		
+		"https://hostname.com/".IfNotThere.Prepend(Uri.UriSchemeHttps)
+			.Dump("no need to prepend");
+	}
 }
