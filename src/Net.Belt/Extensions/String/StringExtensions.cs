@@ -76,6 +76,11 @@ public static class StringExtensions
 		/// Provides extension methods for compression operations.
 		/// </summary>
 		public ZipExtensions GZip => new(s);
+
+		/// <summary>
+		/// Provides extension methods for conditional concatenation operations.
+		/// </summary>
+		public ConditionalConcatenationExtensions IfNotThere => new(s);
 	}
 }
 
