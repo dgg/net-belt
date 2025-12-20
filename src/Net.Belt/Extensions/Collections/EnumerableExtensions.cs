@@ -143,5 +143,23 @@ public static class EnumerableExtensions
         }
         
         #endregion
+        
+        #region delimited string
+        
+        /// <summary>
+        /// Concatenates the elements of a sequence, using the specified separator between each element.
+        /// </summary>
+        /// <param name="delimiter">The string to use as a separator. <see langword="null"/> is treated as an empty string.</param>
+        /// <param name="toString">A delegate that specifies how to convert each element to a string. If <see langword="null"/>, the default <see cref="object.ToString"/> method is used.</param>
+        /// <returns>A string that consists of the elements in source delimited by the <paramref name="delimiter"/>.</returns>
+        public string ToDelimitedString(string delimiter = ", ", Func<T, string>? toString = null) =>
+            string.Join(delimiter, source.Select(toString ?? (t => t?.ToString() ?? string.Empty)));
+        
+        #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public GenerationExtensions<T> Gen => new(source);
     }
 }
