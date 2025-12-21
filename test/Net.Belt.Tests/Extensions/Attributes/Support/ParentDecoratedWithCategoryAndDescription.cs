@@ -1,0 +1,3 @@
+namespace Net.Belt.Tests.Extensions.Attributes.Support;
+
+internal class ParentDecoratedWithCategoryAndDescription : DecoratedWithCategoryAndDescription;
